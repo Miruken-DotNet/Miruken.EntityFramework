@@ -2,9 +2,24 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.1</TargetFramework>
+    <LangVersion>latest</LangVersion>
     <AssemblyVersion>0.0.0.0</AssemblyVersion>
     <FileVersion>0.0.0.0</FileVersion>
     <Version>0.0.0</Version>
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+    <PackageId>Miruken.EntityFramework</PackageId>
+    <Authors>cneuwirt</Authors>
+    <Product>Miruken EntityFramework</Product>
+    <Description>Miruken integration with Entity Framework</Description>
+    <Copyright>Copyright 2020</Copyright>
+    <PackageLicenseUrl>https://github.com/Miruken-DotNet/Miruken.EntityFramework/blob/master/LICENSE</PackageLicenseUrl>
+    <PackageProjectUrl>https://github.com/Miruken-DotNet/MirukenEntityFramework</PackageProjectUrl>
+    <PackageIconUrl>https://avatars0.githubusercontent.com/u/20844317</PackageIconUrl>
+    <PackageReleaseNotes>Summary of changes made in this release of the package.</PackageReleaseNotes>
+    <Company>Miruken</Company>
+    <PackageTags>Miruken</PackageTags>
+    <OutputPath>bin\</OutputPath>
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
   </PropertyGroup>
 
   <ItemGroup>
