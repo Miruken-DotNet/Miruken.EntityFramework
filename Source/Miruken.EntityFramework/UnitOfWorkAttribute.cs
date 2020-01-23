@@ -8,5 +8,8 @@
             : base(typeof(UnitOfWorkFilter<,>))
         {
         }
+
+        public bool ForceNew         { get; set; }
+        public bool BeginTransaction { get; set; }
     }
 }

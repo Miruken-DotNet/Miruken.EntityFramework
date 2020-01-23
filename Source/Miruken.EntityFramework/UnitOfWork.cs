@@ -5,6 +5,7 @@
     using System.Threading.Tasks;
     using Callback;
     using Microsoft.EntityFrameworkCore.ChangeTracking;
+    using Microsoft.EntityFrameworkCore.Storage;
 
     [Unmanaged]
     public class UnitOfWork : Handler, IDisposable
@@ -13,11 +14,15 @@
         private readonly Dictionary<Type, IDBContextUnitOfWork> _contexts =
             new Dictionary<Type, IDBContextUnitOfWork>();
 
-        public UnitOfWork(IHandler handler)
+        public UnitOfWork(IHandler handler, bool beginTransaction)
         {
             _handler = handler ??
                 throw new ArgumentNullException(nameof(handler));
+
+            BeginTransaction = beginTransaction;
         }
+
+        public bool BeginTransaction { get; }
 
         public event Action<UnitOfWork> BeforeCommit;
         public event Func<UnitOfWork, Task> BeforeCommitAsync;
@@ -117,7 +122,7 @@
         {
             if (_contexts.TryGetValue(typeof(T), out var existing))
                 return (UnitOfWork<T>)existing;
-            var uow = new UnitOfWork<T>(_handler.Create<T>());
+            var uow = new UnitOfWork<T>(_handler.Create<T>(), BeginTransaction);
             _contexts.Add(typeof(T), uow);
             return uow;
         }
@@ -136,9 +141,19 @@
 
     public class UnitOfWork<T> : IDBContextUnitOfWork where T : IDbContext
     {
-        internal UnitOfWork(T context)
+        private readonly IDbContextTransaction _transaction;
+
+        internal UnitOfWork(T context, bool beginTransaction)
         {
             Context = context;
+
+            if (beginTransaction)
+            {
+                var database = Context.Database;
+                var transaction = database.CurrentTransaction;
+                if (transaction == null)
+                    _transaction = database.BeginTransaction();
+            }
         }
 
         public T Context { get; }
@@ -197,6 +212,8 @@
 
             Context.SaveChanges();
 
+            _transaction?.Commit();
+
             var afterCommit = AfterCommit;
             afterCommit?.Invoke(this);
 
@@ -221,6 +238,9 @@
             }
 
             await Context.SaveChangesAsync();
+
+            if (_transaction != null)
+                await _transaction.CommitAsync();
 
             var afterCommit = AfterCommit;
             afterCommit?.Invoke(this);

@@ -14,12 +14,22 @@
             IHandler composer, Next<Res> next,
             IFilterProvider provider)
         {
-            var unitOfWork = composer.StashGet<UnitOfWork>();
+            var attribute        = provider as UnitOfWorkAttribute;
+            var beginTransaction = attribute?.BeginTransaction == true;
+
+            UnitOfWork unitOfWork = null;
+
+            if (attribute?.ForceNew != true)
+            {
+                unitOfWork = composer.StashGet<UnitOfWork>();
+                if (beginTransaction && unitOfWork?.BeginTransaction == false)
+                    unitOfWork = null;
+            }
 
             var owner = unitOfWork == null;
             if (owner)
             {
-                unitOfWork = new UnitOfWork(composer);
+                unitOfWork = new UnitOfWork(composer, beginTransaction);
                 composer.StashPut(unitOfWork);
             }
 
