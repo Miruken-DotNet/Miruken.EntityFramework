@@ -149,7 +149,7 @@
 
             if (beginTransaction)
             {
-                var database = Context.Database;
+                var database    = Context.Database;
                 var transaction = database.CurrentTransaction;
                 if (transaction == null)
                     _transaction = database.BeginTransaction();
