@@ -13,4 +13,10 @@
             ContextQuery = c => query.ContextQuery(c).CountAsync();
         }
     }
+
+    public static class AsyncCountQueryExtensions
+    {
+        public static AsyncCountQuery<T> AsyncCount<T>(this Query<T> query) => 
+            new AsyncCountQuery<T>(query);
+    }
 }

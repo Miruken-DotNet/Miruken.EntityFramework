@@ -13,4 +13,10 @@
             ContextQuery = c => query.ContextQuery(c).Count();
         }
     }
+
+    public static class CountQueryExtensions
+    {
+        public static CountQuery<T> Count<T>(this Query<T> query) =>
+            new CountQuery<T>(query);
+    }
 }
