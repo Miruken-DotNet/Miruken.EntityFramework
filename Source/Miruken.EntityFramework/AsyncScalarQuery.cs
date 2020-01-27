@@ -5,7 +5,7 @@
 
     public class AsyncScalarQuery<T>
     {
-        protected Func<IDbContext, Task<T>> ContextQuery { get; set; }
+        public Func<IDbContext, Task<T>> ContextQuery { get; protected set; }
 
         public virtual Task<T> ExecuteAsync(IDbContext context)
         {

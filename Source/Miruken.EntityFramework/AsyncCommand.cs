@@ -5,7 +5,7 @@
 
     public class AsyncCommand
     {
-        protected Func<IDbContext, Task<int>> ContextQuery { get; set; }
+        public Func<IDbContext, Task<int>> ContextQuery { get; protected set; }
 
         public virtual Task<int> ExecuteAsync(IDbContext context)
         {

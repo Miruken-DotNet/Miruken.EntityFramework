@@ -7,7 +7,7 @@
 
     public class SingleQuery<T>
     {
-        protected Func<IDbContext, IQueryable<T>> ContextQuery { get; set; }
+        public Func<IDbContext, IQueryable<T>> ContextQuery { get; protected set; }
 
         public virtual T Execute(IDbContext context)
         {

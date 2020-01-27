@@ -8,7 +8,7 @@
 
     public class Query<T>
     {
-        protected Func<IDbContext, IQueryable<T>> ContextQuery { get; set; }
+        public Func<IDbContext, IQueryable<T>> ContextQuery { get; protected set; }
 
         public virtual IEnumerable<T> Execute(IDbContext context)
         {

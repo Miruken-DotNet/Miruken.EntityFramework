@@ -4,7 +4,7 @@
 
     public class Command
     {
-        protected Func<IDbContext, int> ContextQuery { get; set; }
+        public Func<IDbContext, int> ContextQuery { get; protected set; }
 
         public virtual int Execute(IDbContext context)
         {

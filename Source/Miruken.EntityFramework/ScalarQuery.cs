@@ -4,7 +4,7 @@
 
     public class ScalarQuery<T>
     {
-        protected Func<IDbContext, T> ContextQuery { get; set; }
+        public Func<IDbContext, T> ContextQuery { get; protected set; }
 
         public virtual T Execute(IDbContext context)
         {
