@@ -1,4 +1,6 @@
-﻿namespace Miruken.EntityFramework
+﻿using System.Threading.Tasks;
+
+namespace Miruken.EntityFramework
 {
     using System.Data;
     using System.Linq;
@@ -15,7 +17,7 @@
             where T : class
         {
             return context.Set<T>()
-                .FromSqlRaw($"EXECUTE {procedureName} {StringifySqlParameters(parameters)}", parameters);
+                .FromSqlRaw(Sql(procedureName, parameters), parameters);
         }
 
         public static int ExecuteStoredProcedure(
@@ -24,7 +26,23 @@
             params SqlParameter[] parameters)
         {
             return context.Database
-                .ExecuteSqlRaw($"EXECUTE {procedureName} {StringifySqlParameters(parameters)}", parameters);
+                .ExecuteSqlRaw(Sql(procedureName, parameters), parameters);
+        }
+
+        public static Task<int> ExecuteStoredProcedureAsync(
+            this IDbContext       context, 
+            string                procedureName,
+            params SqlParameter[] parameters)
+        {
+            return context.Database
+                .ExecuteSqlRawAsync(Sql(procedureName, parameters), parameters);
+        }
+
+        private static string Sql(
+            string                procedureName,
+            params SqlParameter[] parameters)
+        {
+            return $"EXECUTE {procedureName} {StringifySqlParameters(parameters)}";
         }
 
         private static string StringifySqlParameters(SqlParameter[] dbParams)
