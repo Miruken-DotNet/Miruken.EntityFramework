@@ -14,9 +14,11 @@
             IHandler composer)
         {
             data ??= new TeamData();
-            data.Id   = entity.Id;
-            data.Name = entity.Name;
-
+            data.Id      = entity.Id;
+            data.Name    = entity.Name;
+            data.Coach   = entity.Coach != null
+                         ? composer.Map<PersonData>(entity.Coach) 
+                         : null;
             data.Players = composer.MapAll<PersonData>(entity.Players);
             return data;
         }
@@ -32,6 +34,13 @@
 
             if (data.Name != null)
                 entity.Name = data.Name;
+
+            if (data.Coach != null)
+            {
+                entity.Coach = entity.Coach != null
+                             ? composer.MapInto(data.Coach, entity.Coach)
+                             : composer.Map<Person>(data.Coach);
+            }
 
             MapPlayers(entity, data.Players, sports, composer);
 

@@ -1,5 +1,6 @@
 ﻿namespace Miruken.EntityFramework
 {
+    using System.Linq;
     using System.Threading.Tasks;
     using Api;
     using Callback;
@@ -14,41 +15,27 @@
             IHandler composer, Next<Res> next,
             IFilterProvider provider)
         {
-            var attribute        = provider as UnitOfWorkAttribute;
-            var beginTransaction = attribute?.BeginTransaction == true;
+            var transaction = member.Dispatcher.Attributes
+                .OfType<TransactionAttribute>().SingleOrDefault();
 
-            UnitOfWork unitOfWork = null;
+            var unitOfWork = new UnitOfWork(
+                composer.StashGet<UnitOfWork>(),
+                provider as UnitOfWorkAttribute,
+                transaction,
+                composer);
 
-            if (attribute?.ForceNew != true)
-            {
-                unitOfWork = composer.StashGet<UnitOfWork>();
-                if (beginTransaction && unitOfWork?.BeginTransaction == false)
-                    unitOfWork = null;
-            }
-
-            var owner = unitOfWork == null;
-            if (owner)
-            {
-                unitOfWork = new UnitOfWork(composer, beginTransaction);
-                composer.StashPut(unitOfWork);
-            }
+            composer.StashPut(unitOfWork);
 
             try
             {
                 var result = await next();
-
-                if (owner)
-                    await unitOfWork.CommitAsync();
-
+                await unitOfWork.CommitAsync();
                 return result;
             }
             finally
             {
-                if (owner)
-                {
-                    composer.StashDrop<UnitOfWork>();
-                    unitOfWork.Dispose();
-                }
+                composer.StashDrop<UnitOfWork>();
+                unitOfWork.Dispose();
             }
         }
     }

@@ -11,7 +11,8 @@
             {
                 ContextQuery = c =>
                 {
-                    IQueryable<Team> query = c.Set<Team>();
+                    IQueryable<Team> query = c.Set<Team>()
+                        .Include(x => x.Coach);
 
                     if (IncludePlayers)
                         query = query.Include(x => x.Players);

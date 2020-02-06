@@ -2,27 +2,34 @@
 {
     using System;
     using System.Collections.Generic;
+    using System.Data;
     using System.Threading.Tasks;
     using Callback;
+    using Microsoft.EntityFrameworkCore;
     using Microsoft.EntityFrameworkCore.ChangeTracking;
     using Microsoft.EntityFrameworkCore.Storage;
 
     [Unmanaged]
     public class UnitOfWork : Handler, IDisposable
     {
+        private readonly UnitOfWork _parent;
+        private readonly UnitOfWorkAttribute _attribute;
+        private readonly TransactionAttribute _transaction;
         private readonly IHandler _handler;
         private readonly Dictionary<Type, IDBContextUnitOfWork> _contexts =
             new Dictionary<Type, IDBContextUnitOfWork>();
 
-        public UnitOfWork(IHandler handler, bool beginTransaction)
+        internal UnitOfWork(
+            UnitOfWork           parent,
+            UnitOfWorkAttribute  attribute,
+            TransactionAttribute transaction,
+            IHandler             handler)
         {
-            _handler = handler ??
-                throw new ArgumentNullException(nameof(handler));
-
-            BeginTransaction = beginTransaction;
+            _handler    = handler ?? throw new ArgumentNullException(nameof(handler));
+            _parent     = parent;
+            _attribute  = attribute;
+            _transaction = transaction;
         }
-
-        public bool BeginTransaction { get; }
 
         public event Action<UnitOfWork> BeforeCommit;
         public event Func<UnitOfWork, Task> BeforeCommitAsync;
@@ -108,7 +115,7 @@
             {
                 try
                 {
-                    uow.Context.Dispose();
+                    uow.Dispose();
                 }
                 catch 
                 {
@@ -117,18 +124,109 @@
             }
         }
 
-        private UnitOfWork<T> GetOrCreateContext<T>()
+        private UnitOfWork<T> GetOrCreateContext<T>(bool create = true)
             where T : IDbContext
         {
             if (_contexts.TryGetValue(typeof(T), out var existing))
                 return (UnitOfWork<T>)existing;
-            var uow = new UnitOfWork<T>(_handler.Create<T>(), BeginTransaction);
+
+            if (!create)
+                return _parent?.GetOrCreateContext<T>(false);
+
+            var isolation = _transaction?.Isolation;
+            IDbContextTransaction transaction = null;
+
+            if (_attribute?.ForceNew != true)
+            {
+                var parent = _parent?.GetOrCreateContext<T>();
+                if (parent != null)
+                {
+                    if (_transaction == null) return parent;
+                    if (parent.Transaction != null)
+                    {
+                        return _transaction.Option switch
+                        {
+                            TransactionOption.Suppress => throw new InvalidOperationException(
+                                "Inner UnitOfWork requested to suppress transactions, but an outer transaction has already started.  If this is desired set ForceNew to true."),
+                            TransactionOption.RequiresNew => throw new InvalidOperationException(
+                                "Inner UnitOfWork required a new transaction.  If this is desired set ForceNew to true."),
+                            _ => _transaction.Isolation == null || parent.Isolation == _transaction.Isolation
+                                   ? parent : throw new InvalidOperationException(
+                                       $"Inner UnitOfWork required Isolation '{_transaction.Isolation}', but the outer transaction has Isolation '{parent.Isolation?.ToString()?? "Default"}'.  If this is desired set ForceNew to true.")
+                        };
+                    }
+                    
+                    if (_transaction.Option == TransactionOption.Suppress)
+                        return parent;
+
+                    throw new InvalidOperationException(
+                        "Inner UnitOfWork requested a Transaction, but the outer did not.  If this is desired set ForceNew to true.");
+                }
+            }
+
+            var context = _handler.Create<T>();
+
+            if (_transaction != null)
+            {
+                switch (_transaction.Option)
+                {
+                    case TransactionOption.Suppress:
+                        break;
+                    case TransactionOption.Required:
+                    {
+                        var parent = _parent?.GetOrCreateContext<T>(false);
+                        transaction = RequireTransaction(context, parent, isolation);
+                        break;
+                    }
+                    case TransactionOption.RequiresNew:
+                        transaction = CreateTransaction(context, isolation);
+                        break;
+                }
+            }
+
+            var uow = new UnitOfWork<T>(context, transaction, isolation);
             _contexts.Add(typeof(T), uow);
             return uow;
         }
+
+        private static IDbContextTransaction CreateTransaction(
+            IDbContext      context,
+            IsolationLevel? isolation)
+        {
+            return isolation != null
+                 ? context.Database.BeginTransaction(isolation.Value)
+                 : context.Database.BeginTransaction();
+        }
+
+        protected IDbContextTransaction RequireTransaction<T>(
+            T               context,
+            UnitOfWork<T>   parent,
+            IsolationLevel? isolation) 
+            where T : IDbContext
+        {
+            if (parent != null && (isolation == null || isolation == parent.Isolation))
+            {
+                var parentContext = parent.Context;
+                var transaction   = parentContext.Database.CurrentTransaction;
+                if (transaction != null)
+                {
+                    try
+                    {
+                        var dbTransaction = transaction.GetDbTransaction();
+                        context.Database.UseTransaction(dbTransaction);
+                        return null;
+                    }
+                    catch
+                    {
+                        // Only supported for relational database
+                    }
+                }
+            }
+            return CreateTransaction(context, isolation);
+        }
     }
 
-    public interface IDBContextUnitOfWork
+    public interface IDBContextUnitOfWork : IDisposable
     {
         IDbContext Context { get; }
 
@@ -141,22 +239,19 @@
 
     public class UnitOfWork<T> : IDBContextUnitOfWork where T : IDbContext
     {
-        private readonly IDbContextTransaction _transaction;
-
-        internal UnitOfWork(T context, bool beginTransaction)
+        internal UnitOfWork(
+            T                     context,
+            IDbContextTransaction transaction,
+            IsolationLevel?       isolation = null)
         {
-            Context = context;
-
-            if (beginTransaction)
-            {
-                var database    = Context.Database;
-                var transaction = database.CurrentTransaction;
-                if (transaction == null)
-                    _transaction = database.BeginTransaction();
-            }
+            Context     = context;
+            Transaction = transaction;
+            Isolation   = isolation;
         }
 
-        public T Context { get; }
+        public T                     Context     { get; }
+        public IDbContextTransaction Transaction { get; }
+        public IsolationLevel?       Isolation   { get; }
 
         IDbContext IDBContextUnitOfWork.Context => Context;
 
@@ -212,7 +307,7 @@
 
             Context.SaveChanges();
 
-            _transaction?.Commit();
+            Transaction?.Commit();
 
             var afterCommit = AfterCommit;
             afterCommit?.Invoke(this);
@@ -239,8 +334,8 @@
 
             await Context.SaveChangesAsync();
 
-            if (_transaction != null)
-                await _transaction.CommitAsync();
+            if (Transaction != null)
+                await Transaction.CommitAsync();
 
             var afterCommit = AfterCommit;
             afterCommit?.Invoke(this);
@@ -267,6 +362,11 @@
             if (entries == null) return;
             foreach (var entry in entries)
                 await entry.ReloadAsync();
+        }
+
+        public void Dispose()
+        {
+            Context.Dispose();
         }
 
         public static implicit operator T(UnitOfWork<T> uow) => uow.Context;

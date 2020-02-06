@@ -9,8 +9,7 @@
     public class SportsContext : DbContext, ISportsContext
     {
         [Creates]
-        public SportsContext(
-            DbContextOptions<SportsContext> options)
+        public SportsContext(DbContextOptions<SportsContext> options)
             : base(options)
         {
         }

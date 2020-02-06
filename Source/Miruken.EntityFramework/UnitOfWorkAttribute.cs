@@ -9,7 +9,6 @@
         {
         }
 
-        public bool ForceNew         { get; set; }
-        public bool BeginTransaction { get; set; }
+        public bool ForceNew { get; set; }
     }
 }
