@@ -16,12 +16,6 @@
             TransactionOption option = TransactionOption.Required)
             : this(option)
         {
-            if (option == TransactionOption.Suppress)
-            {
-                throw new ArgumentException(
-                    "Isolation should not be provided with TransactionOption.Suppress");
-            }
-
             Isolation = isolation;
         }
 

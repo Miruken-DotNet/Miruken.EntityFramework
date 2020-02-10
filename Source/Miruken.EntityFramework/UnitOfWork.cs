@@ -146,8 +146,6 @@
                     {
                         return _transaction.Option switch
                         {
-                            TransactionOption.Suppress => throw new InvalidOperationException(
-                                "Inner UnitOfWork requested to suppress transactions, but an outer transaction has already started.  If this is desired set ForceNew to true."),
                             TransactionOption.RequiresNew => throw new InvalidOperationException(
                                 "Inner UnitOfWork required a new transaction.  If this is desired set ForceNew to true."),
                             _ => _transaction.Isolation == null || parent.Isolation == _transaction.Isolation
@@ -156,9 +154,6 @@
                         };
                     }
                     
-                    if (_transaction.Option == TransactionOption.Suppress)
-                        return parent;
-
                     throw new InvalidOperationException(
                         "Inner UnitOfWork requested a Transaction, but the outer did not.  If this is desired set ForceNew to true.");
                 }
@@ -170,8 +165,6 @@
             {
                 switch (_transaction.Option)
                 {
-                    case TransactionOption.Suppress:
-                        break;
                     case TransactionOption.Required:
                     {
                         var parent = _parent?.GetOrCreateContext<T>(false);
@@ -218,7 +211,7 @@
                     }
                     catch
                     {
-                        // Only supported for relational database
+                        // Only supported for relational databases
                     }
                 }
             }

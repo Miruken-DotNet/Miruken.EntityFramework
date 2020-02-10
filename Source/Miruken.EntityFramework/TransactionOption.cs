@@ -2,8 +2,7 @@
 {
     public enum TransactionOption
     {
-        Suppress    = 1,
-        Required    = 2,
-        RequiresNew = 3
+        Required    = 1,
+        RequiresNew = 2
     }
 }
