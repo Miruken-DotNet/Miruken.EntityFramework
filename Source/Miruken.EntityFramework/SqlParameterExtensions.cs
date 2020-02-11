@@ -28,7 +28,9 @@
             this ICollection<SqlParameter> paramList,
             string                         paramName,
             SqlDbType                      type,
-            object value)
+            object                         value,
+            Action<SqlParameter>           configure = null
+            )
         {
             if (paramList == null)
                 throw new ArgumentNullException(nameof(paramList));
@@ -40,11 +42,17 @@
             }
 
             var param = new SqlParameter { ParameterName = paramName, SqlDbType = type, Value = value ?? DBNull.Value };
+            configure?.Invoke(param);
             return paramList.AddParameter(param);
         }
 
         public static ICollection<SqlParameter> AddParameter<T>(
-            this ICollection<SqlParameter> paramList, string paramName, SqlDbType type, T? value) where T : struct
+            this ICollection<SqlParameter> paramList, 
+            string                         paramName, 
+            SqlDbType                      type, 
+            T?                             value,
+            Action<SqlParameter>           configure = null
+            ) where T : struct
         {
             if (paramList == null)
                 throw new ArgumentNullException(nameof(paramList));
@@ -62,6 +70,7 @@
             else
                 param.Value = DBNull.Value;
 
+            configure?.Invoke(param);
             return paramList.AddParameter(param);
         }
     }
