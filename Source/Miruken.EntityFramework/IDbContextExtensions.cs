@@ -1,9 +1,7 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-
-namespace Miruken.EntityFramework
+﻿namespace Miruken.EntityFramework
 {
+    using System.Linq;
+    using System.Threading.Tasks;
     using System.Data;
     using System.Text;
     using Microsoft.Data.SqlClient;
@@ -11,15 +9,14 @@ namespace Miruken.EntityFramework
 
     public static class IDBContextExtensions
     {
-        public static IEnumerable<T> ExecuteStoredProcedure<T>(
+        public static IQueryable<T> ExecuteStoredProcedure<T>(
             this IDbContext       context,
             string                procedureName,
             params SqlParameter[] parameters) 
             where T : class
         {
             return context.Set<T>()
-                .FromSqlRaw(Sql(procedureName, parameters), parameters)
-                .AsEnumerable();
+                .FromSqlRaw(Sql(procedureName, parameters), parameters);
         }
 
         public static int ExecuteStoredProcedure(
