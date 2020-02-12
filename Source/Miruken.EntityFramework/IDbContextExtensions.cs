@@ -1,23 +1,25 @@
-﻿using System.Threading.Tasks;
+﻿using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace Miruken.EntityFramework
 {
     using System.Data;
-    using System.Linq;
     using System.Text;
     using Microsoft.Data.SqlClient;
     using Microsoft.EntityFrameworkCore;
 
     public static class IDBContextExtensions
     {
-        public static IQueryable<T> ExecuteStoredProcedure<T>(
+        public static IEnumerable<T> ExecuteStoredProcedure<T>(
             this IDbContext       context,
             string                procedureName,
             params SqlParameter[] parameters) 
             where T : class
         {
             return context.Set<T>()
-                .FromSqlRaw(Sql(procedureName, parameters), parameters);
+                .FromSqlRaw(Sql(procedureName, parameters), parameters)
+                .AsEnumerable();
         }
 
         public static int ExecuteStoredProcedure(
