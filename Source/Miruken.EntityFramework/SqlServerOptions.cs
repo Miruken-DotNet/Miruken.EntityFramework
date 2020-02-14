@@ -24,10 +24,11 @@
         private static IReadOnlyDictionary<Type, IDbContextOptionsExtension> 
             GetExtensions(IConfiguration configuration, ILoggerFactory loggerFactory)
         {
-            var name = typeof(T).Name.Replace("Context", "");
+            var name             = typeof(T).Name;
             var connectionString = configuration.GetConnectionString(name) 
+                ?? configuration.GetConnectionString(name.Replace("Context", ""))
                 ?? throw new InvalidOperationException(
-                    $"ConnectionString '{name}' not found");
+                       $"ConnectionString for '{name}' not found");
 
             var builder = new DbContextOptionsBuilder()
                 .UseSqlServer(connectionString);
