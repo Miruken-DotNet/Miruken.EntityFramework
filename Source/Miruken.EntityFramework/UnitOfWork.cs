@@ -25,9 +25,9 @@
             TransactionAttribute transaction,
             IHandler             handler)
         {
-            _handler    = handler ?? throw new ArgumentNullException(nameof(handler));
-            _parent     = parent;
-            _attribute  = attribute;
+            _handler     = handler ?? throw new ArgumentNullException(nameof(handler));
+            _parent      = parent;
+            _attribute   = attribute;
             _transaction = transaction;
         }
 
