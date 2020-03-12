@@ -24,17 +24,18 @@
                 transaction,
                 composer);
 
-            composer.StashPut(unitOfWork);
+            var stash = new Stash();
+            stash.StashPut(unitOfWork);
 
             try
             {
-                var result = await next();
+                var result = await next(stash + composer);
                 await unitOfWork.CommitAsync();
                 return result;
             }
             finally
             {
-                composer.StashDrop<UnitOfWork>();
+                stash.StashDrop<UnitOfWork>();
                 unitOfWork.Dispose();
             }
         }
