@@ -19,23 +19,19 @@
                 .OfType<TransactionAttribute>().SingleOrDefault();
 
             var unitOfWork = new UnitOfWork(
-                composer.StashGet<UnitOfWork>(),
+                composer.Resolve<UnitOfWork>(),
                 provider as UnitOfWorkAttribute,
                 transaction,
                 composer);
 
-            var stash = new Stash();
-            stash.StashPut(unitOfWork);
-
             try
             {
-                var result = await next(stash + composer);
+                var result = await next(unitOfWork + composer);
                 await unitOfWork.CommitAsync();
                 return result;
             }
             finally
             {
-                stash.StashDrop<UnitOfWork>();
                 unitOfWork.Dispose();
             }
         }
