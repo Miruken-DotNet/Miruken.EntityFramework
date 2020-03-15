@@ -21,11 +21,9 @@
             if (action == null)
                 throw new ArgumentNullException(nameof(action));
 
-            var uowHandler = new Stash() + handler;
-            var parent     = handler.StashGet<UnitOfWork>();
-            var unitOfWork = new UnitOfWork(parent, ForceNew, transaction, uowHandler);
-            uowHandler.StashPut(unitOfWork);
-            action(unitOfWork, uowHandler);
+            var parent     = handler.Resolve<UnitOfWork>();
+            var unitOfWork = new UnitOfWork(parent, ForceNew, transaction, handler);
+            action(unitOfWork, unitOfWork + handler);
             return unitOfWork;
         }
 
@@ -40,11 +38,9 @@
             if (action == null)
                 throw new ArgumentNullException(nameof(action));
 
-            var uowHandler = new Stash() + handler;
-            var parent     = handler.StashGet<UnitOfWork>();
-            var unitOfWork = new UnitOfWork(parent, ForceNew, transaction, uowHandler);
-            uowHandler.StashPut(unitOfWork);
-            await action(unitOfWork, uowHandler);
+            var parent     = handler.Resolve<UnitOfWork>();
+            var unitOfWork = new UnitOfWork(parent, ForceNew, transaction, handler);
+            await action(unitOfWork, unitOfWork + handler);
             return unitOfWork;
         }
     }
