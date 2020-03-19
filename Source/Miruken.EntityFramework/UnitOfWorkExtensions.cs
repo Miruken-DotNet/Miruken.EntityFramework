@@ -2,7 +2,6 @@
 {
     using System;
     using System.Threading.Tasks;
-    using Api;
     using Callback;
 
     public static class UnitOfWorkExtensions
