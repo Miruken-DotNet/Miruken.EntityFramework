@@ -13,7 +13,7 @@
     <Description>Miruken integration with Entity Framework</Description>
     <Copyright>Copyright 2020</Copyright>
     <PackageLicenseUrl>https://github.com/Miruken-DotNet/Miruken.EntityFramework/blob/master/LICENSE</PackageLicenseUrl>
-    <PackageProjectUrl>https://github.com/Miruken-DotNet/MirukenEntityFramework</PackageProjectUrl>
+    <PackageProjectUrl>https://github.com/Miruken-DotNet/Miruken.EntityFramework</PackageProjectUrl>
     <PackageIconUrl>https://avatars0.githubusercontent.com/u/20844317</PackageIconUrl>
     <PackageReleaseNotes>Summary of changes made in this release of the package.</PackageReleaseNotes>
     <Company>Miruken</Company>
