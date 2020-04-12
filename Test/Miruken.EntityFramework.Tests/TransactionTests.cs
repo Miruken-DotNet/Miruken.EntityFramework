@@ -5,51 +5,74 @@
     using System.Threading.Tasks;
     using Api;
     using Callback;
-    using Context;
-    using Microsoft.EntityFrameworkCore;
-    using Microsoft.Extensions.DependencyInjection;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using Miruken.Api;
-    using Register;
-    using ServiceCollection = Register.ServiceCollection;
 
-    public abstract class TransactionScenario
+    public abstract class TransactionTests : DatabaseScenario
     {
-        protected Context Context;
-        private DbContextOptions<SportsContext> _options;
-        private SportsContext _context;
-
-        [TestInitialize]
-        public void TestInitialize()
+        [TestMethod]
+        public async Task Should_Require_Existing_Transaction()
         {
-            var builder = new DbContextOptionsBuilder<SportsContext>()
-                .UseSqlServer(
-                    $"Server=(LocalDB)\\MSSQLLocalDB;Database=sports_db_{Guid.NewGuid()};Trusted_Connection=True;MultipleActiveResultSets=true");
-            _options = builder.Options;
-
-            _context = new SportsContext(_options);
-            _context.Database.EnsureCreated();
-
-            Context = new ServiceCollection()
-                .AddSingleton(_options)
-                .AddMiruken(configure =>
-                {
-                    configure
-                        .PublicSources(sources => sources.FromAssemblyOf<UnitOfWorkTests>())
-                        .WithEntityFrameworkCore();
-                }).Build();
+            await Context.Send(new Test<RequiredTransactionScenario.Required>());
         }
 
-        [TestCleanup]
-        public void TestCleanup()
+        [TestMethod]
+        public async Task Should_Fail_Required_Mismatched_Isolation_Transaction()
         {
-            using (_context)
+            try
             {
-                _context.Database.EnsureDeleted();
+                await Context.Send(new Test<RequiredTransactionScenario.RequiredRepeatableRead>());
+                Assert.Fail("Expected to fail");
             }
-            Context.End();
+            catch (InvalidOperationException ex)
+            {
+                Assert.AreEqual(
+                    "Inner UnitOfWork required Isolation 'RepeatableRead', but the outer transaction has Isolation 'Default'.  If this is desired set ForceNew to true.",
+                    ex.Message);
+            }
         }
 
+        [TestMethod]
+        public async Task Should_Fail_Requires_New_Inner_Transaction()
+        {
+            try
+            {
+                await Context.Send(new Test<RequiredTransactionScenario.RequiresNew>());
+                Assert.Fail("Expected to fail");
+            }
+            catch (InvalidOperationException ex)
+            {
+                Assert.AreEqual(
+                    "Inner UnitOfWork required a new transaction.  If this is desired set ForceNew to true.",
+                    ex.Message);
+            }
+        }
+
+        [TestMethod]
+        public async Task Should_Require_New_Transaction()
+        {
+            await Context.Send(new Test<RequiresNewTransactionScenario.Required>());
+        }
+
+        [TestMethod]
+        public async Task Should_Fail_Requires_New_Transaction()
+        {
+            try
+            {
+                await Context.Send(new Test<RequiresNewTransactionScenario.RequiresNew>());
+                Assert.Fail("Expected to fail");
+            }
+            catch (InvalidOperationException ex)
+            {
+                Assert.AreEqual(
+                    "Inner UnitOfWork required a new transaction.  If this is desired set ForceNew to true.",
+                    ex.Message);
+            }
+        }
+    }
+
+    public abstract class TestHandler : Handler
+    {
         protected static Task<LeagueResult> CreateLeague(IHandler composer)
         {
             return composer.Send(new CreateLeague
@@ -60,24 +83,23 @@
                 }
             });
         }
+    }
 
-        public class Test<TScenario> where TScenario : new()
-        {
-            public TScenario Scenario { get; } = new TScenario();
-        }
+    public class Test<TScenario> where TScenario : new()
+    {
+        public TScenario Scenario { get; } = new TScenario();
     }
 
     #region Required Scenario
 
-    [TestClass]
-    public class RequiredTransactionScenario : TransactionScenario
+    public class RequiredTransactionScenario
     {
         public class Required    { }
         public class RequiresNew { }
 
         public class RequiredRepeatableRead { }
 
-        public class Handler
+        public class Handler : TestHandler
         {
 // Required
             [Handles, UnitOfWork, Transaction]
@@ -91,7 +113,6 @@
             {
                 return CreateLeague(composer);
             }
-
 
 // Required Repeatable Read
             [Handles, UnitOfWork, Transaction]
@@ -121,56 +142,17 @@
                 return CreateLeague(composer);
             }
         }
-
-        [TestMethod]
-        public async Task Should_Require_Transaction()
-        {
-            await Context.Send(new Test<Required>());
-        }
-
-        [TestMethod]
-        public async Task Should_Fail_Required_Mismatched_Isolation_Transaction()
-        {
-            try
-            {
-                await Context.Send(new Test<RequiredRepeatableRead>());
-                Assert.Fail("Expected to fail");
-            }
-            catch (InvalidOperationException ex)
-            {
-                Assert.AreEqual(
-                    "Inner UnitOfWork required Isolation 'RepeatableRead', but the outer transaction has Isolation 'Default'.  If this is desired set ForceNew to true.",
-                    ex.Message);
-            }
-        }
-
-        [TestMethod]
-        public async Task Should_Fail_Requires_New_Transaction()
-        {
-            try
-            {
-                await Context.Send(new Test<RequiresNew>());
-                Assert.Fail("Expected to fail");
-            }
-            catch (InvalidOperationException ex)
-            {
-                Assert.AreEqual(
-                    "Inner UnitOfWork required a new transaction.  If this is desired set ForceNew to true.",
-                    ex.Message);
-            }
-        }
     }
     #endregion
 
     #region Requires New Scenario
 
-    [TestClass]
-    public class RequiresNewTransactionScenario : TransactionScenario
+    public class RequiresNewTransactionScenario
     {
         public class Required    { }
         public class RequiresNew { }
 
-        public class Handler
+        public class Handler : TestHandler
         {
 // Required
             [Handles, UnitOfWork, Transaction(TransactionOption.RequiresNew)]
@@ -196,28 +178,6 @@
             public Task TestRequiresNew(RequiresNew _, IHandler composer)
             {
                 return CreateLeague(composer);
-            }
-        }
-
-        [TestMethod]
-        public async Task Should_Require_Transaction()
-        {
-            await Context.Send(new Test<Required>());
-        }
-
-        [TestMethod]
-        public async Task Should_Fail_Requires_New_Transaction()
-        {
-            try
-            {
-                await Context.Send(new Test<RequiresNew>());
-                Assert.Fail("Expected to fail");
-            }
-            catch (InvalidOperationException ex)
-            {
-                Assert.AreEqual(
-                    "Inner UnitOfWork required a new transaction.  If this is desired set ForceNew to true.",
-                    ex.Message);
             }
         }
     }

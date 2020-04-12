@@ -1,7 +1,4 @@
-﻿using System.ComponentModel;
-using System.Reflection;
-
-namespace Miruken.EntityFramework
+﻿namespace Miruken.EntityFramework.SqlServer
 {
     using System;
     using System.Collections.Generic;
@@ -32,8 +29,7 @@ namespace Miruken.EntityFramework
             string                         paramName,
             SqlDbType                      type,
             object                         value,
-            Action<SqlParameter>           configure = null
-            )
+            Action<SqlParameter>           configure = null)
         {
             if (paramList == null)
                 throw new ArgumentNullException(nameof(paramList));
@@ -44,7 +40,12 @@ namespace Miruken.EntityFramework
                     "Cannot add parameters to a Read - Only Collection.");
             }
 
-            var param = new SqlParameter { ParameterName = paramName, SqlDbType = type, Value = value ?? DBNull.Value };
+            var param = new SqlParameter
+            {
+                ParameterName = paramName,
+                SqlDbType     = type,
+                Value         = value ?? DBNull.Value
+            };
             configure?.Invoke(param);
             return paramList.AddParameter(param);
         }
@@ -89,33 +90,5 @@ namespace Miruken.EntityFramework
                 TypeName = sqlType
             });
         }
-
-        public static DataTable ToDataTable<T>(this IEnumerable<T> items)
-        {
-            var table = new DataTable(typeof(T).Name);
-            var props = typeof(T).GetProperties(BindingFlags.Public | BindingFlags.Instance);
-
-            foreach (var prop in props)
-            {
-                var propType = prop.PropertyType;
-
-                if (propType.IsGenericType &&
-                    propType.GetGenericTypeDefinition() == typeof(Nullable<>))
-                    propType = new NullableConverter(propType).UnderlyingType;
-
-                table.Columns.Add(prop.Name, propType);
-            }
-
-            foreach (var item in items)
-            {
-                var values = new object[props.Length];
-                for (var i = 0; i < props.Length; i++)
-                    values[i] = props[i].GetValue(item, null);
-                table.Rows.Add(values);
-            }
-
-            return table;
-        }
-
     }
 }

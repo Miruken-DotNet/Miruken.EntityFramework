@@ -14,7 +14,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Source\Miruken.EntityFramework\Miruken.EntityFramework.csproj" />
+    <ProjectReference Include="..\..\Source\Miruken.EntityFramework.Sqlite\Miruken.EntityFramework.Sqlite.csproj" />
+    <ProjectReference Include="..\..\Source\Miruken.EntityFramework.SqlServer\Miruken.EntityFramework.SqlServer.csproj" />
   </ItemGroup>
 
 </Project>

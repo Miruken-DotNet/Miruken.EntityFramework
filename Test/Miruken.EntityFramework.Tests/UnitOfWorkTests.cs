@@ -5,53 +5,14 @@ namespace Miruken.EntityFramework.Tests
     using System.Linq;
     using System.Threading.Tasks;
     using Api;
-    using Context;
     using Domain;
     using Microsoft.EntityFrameworkCore;
-    using Microsoft.Extensions.DependencyInjection;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using Miruken.Api;
-    using Register;
-    using ServiceCollection = Register.ServiceCollection;
 
-    [TestClass]
-    public class UnitOfWorkTests
+    public abstract class UnitOfWorkTests : DatabaseScenario
     {
-        private Context Context;
-        private DbContextOptions<SportsContext> _options;
-        private SportsContext _context;
-
-        [TestInitialize]
-        public void TestInitialize()
-        {
-            var builder = new DbContextOptionsBuilder<SportsContext>()
-                .UseSqlServer(
-                    $"Server=(LocalDB)\\MSSQLLocalDB;Database=sports_db_{Guid.NewGuid()};Trusted_Connection=True;MultipleActiveResultSets=true");
-            _options = builder.Options;
-
-            _context = new SportsContext(_options);
-            _context.Database.EnsureCreated();
-
-            Context = new ServiceCollection()
-                .AddSingleton(_options)
-                .AddMiruken(configure =>
-                {
-                    configure
-                        .PublicSources(sources => sources.FromAssemblyOf<UnitOfWorkTests>())
-                        .WithEntityFrameworkCore();
-                }).Build();
-        }
-
-        [TestCleanup]
-        public void TestCleanup()
-        {
-            using (_context)
-            {
-                _context.Database.EnsureDeleted();
-            }
-
-            Context.End();
-        }
+        protected virtual bool SupportsNestedTransactions => false;
 
         [TestMethod]
         public async Task Should_Create_Read_Update()
@@ -61,7 +22,7 @@ namespace Miruken.EntityFramework.Tests
                 Name = "Craig"
             };
 
-            await using (var context = new SportsContext(_options))
+            await using (var context = new SportsContext(Options))
             {
                 await using var transaction = context.Database.BeginTransaction();
                 context.Add(team);
@@ -69,7 +30,7 @@ namespace Miruken.EntityFramework.Tests
                 await transaction.CommitAsync();
             }
 
-            await using (var context = new SportsContext(_options))
+            await using (var context = new SportsContext(Options))
             {
                 var fetchTeam = (await new QueryTeam.ById(team.Id)
                     .ExecuteAsync(context)).Single();
@@ -80,21 +41,22 @@ namespace Miruken.EntityFramework.Tests
                 await transaction.CommitAsync();
             }
 
-            await using (var context = new SportsContext(_options))
+            await using (var context = new SportsContext(Options))
             {
                 var fetchTeam = (await new QueryTeam.ById(team.Id)
                     .ExecuteAsync(context)).Single();
                 Assert.AreEqual("Matthew", fetchTeam.Name);
             }
 
-            await using (var context = new SportsContext(_options))
+            if (SupportsNestedTransactions)
             {
+                await using var context = new SportsContext(Options);
                 await using var transaction = context.Database.BeginTransaction();
                 var fetchTeam = (await new QueryTeam.ById(team.Id)
                     .ExecuteAsync(context)).Single();
                 fetchTeam.Name = "John";
                 await context.SaveChangesAsync();
-                await using (var context2 = new SportsContext(_options))
+                await using (var context2 = new SportsContext(Options))
                 {
                     await using var transaction2 = context2.Database.BeginTransaction(
                         IsolationLevel.ReadCommitted);

@@ -5,7 +5,11 @@ VisualStudioVersion = 16.0.29609.76
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Miruken.EntityFramework", "Source\Miruken.EntityFramework\Miruken.EntityFramework.csproj", "{8F5D9294-3536-4F67-9BAF-A723C7EE9BA3}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Miruken.EntityFramework.Tests", "Test\Miruken.EntityFramework.Tests\Miruken.EntityFramework.Tests.csproj", "{026242DB-0B41-468B-8904-7C69C95F52FE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Miruken.EntityFramework.Tests", "Test\Miruken.EntityFramework.Tests\Miruken.EntityFramework.Tests.csproj", "{026242DB-0B41-468B-8904-7C69C95F52FE}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Miruken.EntityFramework.SqlServer", "Source\Miruken.EntityFramework.SqlServer\Miruken.EntityFramework.SqlServer.csproj", "{CF33DD38-C7DB-48FB-926A-A31D4DB9E10E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Miruken.EntityFramework.Sqlite", "Source\Miruken.EntityFramework.Sqlite\Miruken.EntityFramework.Sqlite.csproj", "{6FE6DF72-EF41-49F1-A344-754B810588B5}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +25,14 @@ Global
 		{026242DB-0B41-468B-8904-7C69C95F52FE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{026242DB-0B41-468B-8904-7C69C95F52FE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{026242DB-0B41-468B-8904-7C69C95F52FE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CF33DD38-C7DB-48FB-926A-A31D4DB9E10E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CF33DD38-C7DB-48FB-926A-A31D4DB9E10E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CF33DD38-C7DB-48FB-926A-A31D4DB9E10E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CF33DD38-C7DB-48FB-926A-A31D4DB9E10E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6FE6DF72-EF41-49F1-A344-754B810588B5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6FE6DF72-EF41-49F1-A344-754B810588B5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6FE6DF72-EF41-49F1-A344-754B810588B5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6FE6DF72-EF41-49F1-A344-754B810588B5}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

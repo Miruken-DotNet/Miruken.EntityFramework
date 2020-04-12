@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netstandard2.1</TargetFramework>
@@ -7,17 +7,17 @@
     <FileVersion>0.0.0.0</FileVersion>
     <Version>0.0.0</Version>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
-    <PackageId>Miruken.EntityFramework</PackageId>
+    <PackageId>Miruken.EntityFramework.SqlServer</PackageId>
     <Authors>cneuwirt</Authors>
-    <Product>Miruken EntityFramework</Product>
-    <Description>Miruken integration with Entity Framework</Description>
+    <Product>Miruken EntityFramework SqlServer</Product>
+    <Description>Miruken Entity Framework Sql Server Support</Description>
     <Copyright>Copyright 2020</Copyright>
     <PackageLicenseUrl>https://github.com/Miruken-DotNet/Miruken.EntityFramework/blob/master/LICENSE</PackageLicenseUrl>
     <PackageProjectUrl>https://github.com/Miruken-DotNet/Miruken.EntityFramework</PackageProjectUrl>
     <PackageIconUrl>https://avatars0.githubusercontent.com/u/20844317</PackageIconUrl>
     <PackageReleaseNotes>Summary of changes made in this release of the package.</PackageReleaseNotes>
     <Company>Miruken</Company>
-    <PackageTags>Miruken EntityFramework</PackageTags>
+    <PackageTags>Miruken EntityFramework SqlServer</PackageTags>
     <OutputPath>bin\</OutputPath>
     <PublishRepositoryUrl>true</PublishRepositoryUrl>
   </PropertyGroup>
@@ -27,8 +27,11 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="3.1.1" />
-    <PackageReference Include="Miruken" Version="4.1.5" />
+    <ProjectReference Include="..\Miruken.EntityFramework\Miruken.EntityFramework.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="3.1.1" />
     <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0-beta2-19554-01" PrivateAssets="All" />
   </ItemGroup>
 
