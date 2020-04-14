@@ -5,6 +5,7 @@ namespace Miruken.EntityFramework.Tests
     using System.Linq;
     using System.Threading.Tasks;
     using Api;
+    using Callback;
     using Domain;
     using Microsoft.EntityFrameworkCore;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
@@ -22,7 +23,7 @@ namespace Miruken.EntityFramework.Tests
                 Name = "Craig"
             };
 
-            await using (var context = new SportsContext(Options))
+            await using (var context = Context.Create<SportsContext>())
             {
                 await using var transaction = context.Database.BeginTransaction();
                 context.Add(team);
@@ -30,7 +31,7 @@ namespace Miruken.EntityFramework.Tests
                 await transaction.CommitAsync();
             }
 
-            await using (var context = new SportsContext(Options))
+            await using (var context = Context.Create<SportsContext>())
             {
                 var fetchTeam = (await new QueryTeam.ById(team.Id)
                     .ExecuteAsync(context)).Single();
@@ -41,7 +42,7 @@ namespace Miruken.EntityFramework.Tests
                 await transaction.CommitAsync();
             }
 
-            await using (var context = new SportsContext(Options))
+            await using (var context = Context.Create<SportsContext>())
             {
                 var fetchTeam = (await new QueryTeam.ById(team.Id)
                     .ExecuteAsync(context)).Single();
@@ -50,13 +51,13 @@ namespace Miruken.EntityFramework.Tests
 
             if (SupportsNestedTransactions)
             {
-                await using var context = new SportsContext(Options);
+                await using var context = Context.Create<SportsContext>();
                 await using var transaction = context.Database.BeginTransaction();
                 var fetchTeam = (await new QueryTeam.ById(team.Id)
                     .ExecuteAsync(context)).Single();
                 fetchTeam.Name = "John";
                 await context.SaveChangesAsync();
-                await using (var context2 = new SportsContext(Options))
+                await using (var context2 = Context.Create<SportsContext>())
                 {
                     await using var transaction2 = context2.Database.BeginTransaction(
                         IsolationLevel.ReadCommitted);

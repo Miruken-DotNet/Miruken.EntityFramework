@@ -41,20 +41,24 @@
                 .ExecuteSqlRawAsync(Sql(procedureName, parameters), parameters);
         }
 
-        public static IReadOnlyDictionary<Type, IDbContextOptionsExtension> CreateDbContextExtensions<T>(
-            this IConfiguration                                     configuration,
-            Action<DbContextOptionsBuilder, IConfiguration, string> configure,
-            ILoggerFactory                                          loggerFactory = null)
+        public static IReadOnlyDictionary<Type, IDbContextOptionsExtension>
+            CreateDbContextExtensions<T, TB>(
+            this IConfiguration configuration,
+            Action<DbContextOptionsBuilder, IConfiguration, string, Action<TB>> configure,
+            ILoggerFactory      loggerFactory = null,
+            Action<TB>          options       = null)
             where T : DbContext
         {
-            return CreateDbContextExtensions(configuration, typeof(T), configure, loggerFactory);
+            return CreateDbContextExtensions(configuration, typeof(T), configure, loggerFactory, options);
         }
 
-        public static IReadOnlyDictionary<Type, IDbContextOptionsExtension> CreateDbContextExtensions(
-            this IConfiguration                                     configuration, 
-            Type                                                    dbContextType, 
-            Action<DbContextOptionsBuilder, IConfiguration, string> configure, 
-            ILoggerFactory                                          loggerFactory = null)
+        public static IReadOnlyDictionary<Type, IDbContextOptionsExtension>
+            CreateDbContextExtensions<TB>(
+            this IConfiguration configuration, 
+            Type                dbContextType, 
+            Action<DbContextOptionsBuilder, IConfiguration, string, Action<TB>> configure, 
+            ILoggerFactory      loggerFactory = null,
+            Action<TB>          options       = null)
         {
             if (configuration == null)
                 throw new ArgumentNullException(nameof(configuration));
@@ -75,7 +79,7 @@
                     $"ConnectionString for '{name}' not found");
 
             var builder = new DbContextOptionsBuilder();
-            configure(builder, configuration, connectionString);
+            configure(builder, configuration, connectionString, options);
 
             if (loggerFactory != null)
                 builder.UseLoggerFactory(loggerFactory);

@@ -1,14 +1,15 @@
-﻿namespace Miruken.EntityFramework.Sqlite
+﻿namespace Miruken.EntityFramework.PostgresSQL
 {
     using System;
     using System.Collections.Generic;
-    using Microsoft.Data.Sqlite;
+    using Npgsql;
+    using NpgsqlTypes;
 
-    public static class SqliteParameterExtensions
+    public static class PostgresSQLParameterExtensions
     {
-        public static ICollection<SqliteParameter> AddParameter(
-            this ICollection<SqliteParameter> paramList,
-            SqliteParameter                   param)
+        public static ICollection<NpgsqlParameter> AddParameter(
+            this ICollection<NpgsqlParameter> paramList,
+            NpgsqlParameter                   param)
         {
             if (paramList == null)
                 throw new ArgumentNullException(nameof(paramList));
@@ -23,12 +24,12 @@
             return paramList;
         }
 
-        public static ICollection<SqliteParameter> AddParameter(
-            this ICollection<SqliteParameter> paramList,
+        public static ICollection<NpgsqlParameter> AddParameter(
+            this ICollection<NpgsqlParameter> paramList,
             string                            paramName,
-            SqliteType                        type,
+            NpgsqlDbType                      type,
             object                            value,
-            Action<SqliteParameter>           configure = null)
+            Action<NpgsqlParameter>           configure = null)
         {
             if (paramList == null)
                 throw new ArgumentNullException(nameof(paramList));
@@ -39,22 +40,22 @@
                     "Cannot add parameters to a Read - Only Collection.");
             }
 
-            var param = new SqliteParameter
+            var param = new NpgsqlParameter
             {
                 ParameterName = paramName,
-                SqliteType    = type, 
+                NpgsqlDbType  = type, 
                 Value         = value ?? DBNull.Value
             };
             configure?.Invoke(param);
             return paramList.AddParameter(param);
         }
 
-        public static ICollection<SqliteParameter> AddParameter<T>(
-            this ICollection<SqliteParameter> paramList, 
+        public static ICollection<NpgsqlParameter> AddParameter<T>(
+            this ICollection<NpgsqlParameter> paramList, 
             string                            paramName, 
-            SqliteType                        type, 
+            NpgsqlDbType                      type, 
             T?                                value,
-            Action<SqliteParameter>           configure = null
+            Action<NpgsqlParameter>           configure = null
             ) where T : struct
         {
             if (paramList == null)
@@ -66,7 +67,7 @@
                     "Cannot add parameters to a Read - Only Collection.");
             }
 
-            var param = new SqliteParameter(paramName, type);
+            var param = new NpgsqlParameter(paramName, type);
 
             if (value.HasValue)
                 param.Value = value.Value;

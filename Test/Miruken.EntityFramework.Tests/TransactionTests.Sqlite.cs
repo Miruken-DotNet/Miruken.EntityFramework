@@ -1,18 +1,28 @@
 ﻿namespace Miruken.EntityFramework.Tests
 {
     using System;
-    using Microsoft.EntityFrameworkCore;
+    using System.Collections.Generic;
+    using Microsoft.Extensions.Configuration;
+    using Microsoft.Extensions.DependencyInjection;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using Sqlite;
 
     [TestClass]
     public class TransactionSqliteTests : TransactionTests
     {
-        protected override Type DbContextOptionsType => typeof(SqliteOptions<>);
+        protected override void Setup(EntityFrameworkOptions options)
+        {
+            options.UseDefaultOptions(typeof(SqliteOptions<>));
+        }
 
-        protected override DbContextOptions<SportsContext> GetDbContextOptions() =>
-            new DbContextOptionsBuilder<SportsContext>()
-                .UseSqlite($"Data Source = sports_db_{Guid.NewGuid()}")
-                .Options;
+        protected override void Configure(
+            ConfigurationBuilder configuration,
+            IServiceCollection    services)
+        {
+            configuration.AddInMemoryCollection(new Dictionary<string, string>
+            {
+                ["ConnectionStrings:SportsContext"] = $"Data Source = sports_db_{Guid.NewGuid()}",
+            });
+        }
     }
 }

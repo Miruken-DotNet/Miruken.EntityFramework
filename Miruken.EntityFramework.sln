@@ -7,9 +7,13 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Miruken.EntityFramework", "
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Miruken.EntityFramework.Tests", "Test\Miruken.EntityFramework.Tests\Miruken.EntityFramework.Tests.csproj", "{026242DB-0B41-468B-8904-7C69C95F52FE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Miruken.EntityFramework.SqlServer", "Source\Miruken.EntityFramework.SqlServer\Miruken.EntityFramework.SqlServer.csproj", "{CF33DD38-C7DB-48FB-926A-A31D4DB9E10E}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Miruken.EntityFramework.SqlServer", "Source\Miruken.EntityFramework.SqlServer\Miruken.EntityFramework.SqlServer.csproj", "{CF33DD38-C7DB-48FB-926A-A31D4DB9E10E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Miruken.EntityFramework.Sqlite", "Source\Miruken.EntityFramework.Sqlite\Miruken.EntityFramework.Sqlite.csproj", "{6FE6DF72-EF41-49F1-A344-754B810588B5}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Miruken.EntityFramework.Sqlite", "Source\Miruken.EntityFramework.Sqlite\Miruken.EntityFramework.Sqlite.csproj", "{6FE6DF72-EF41-49F1-A344-754B810588B5}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Miruken.EntityFramework.PostgresSQL", "Source\Miruken.EntityFramework.PostgresSQL\Miruken.EntityFramework.PostgresSQL.csproj", "{2D2F6E8D-3E67-4A6C-9483-7618DF23BDF5}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Miruken.EntityFramework.MySql", "Source\Miruken.EntityFramework.MySql\Miruken.EntityFramework.MySql.csproj", "{35CFEC2E-38D8-425E-98C5-5A61A6755AB0}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,6 +37,14 @@ Global
 		{6FE6DF72-EF41-49F1-A344-754B810588B5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6FE6DF72-EF41-49F1-A344-754B810588B5}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6FE6DF72-EF41-49F1-A344-754B810588B5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2D2F6E8D-3E67-4A6C-9483-7618DF23BDF5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2D2F6E8D-3E67-4A6C-9483-7618DF23BDF5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2D2F6E8D-3E67-4A6C-9483-7618DF23BDF5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2D2F6E8D-3E67-4A6C-9483-7618DF23BDF5}.Release|Any CPU.Build.0 = Release|Any CPU
+		{35CFEC2E-38D8-425E-98C5-5A61A6755AB0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{35CFEC2E-38D8-425E-98C5-5A61A6755AB0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{35CFEC2E-38D8-425E-98C5-5A61A6755AB0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{35CFEC2E-38D8-425E-98C5-5A61A6755AB0}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

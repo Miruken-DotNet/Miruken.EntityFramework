@@ -1,14 +1,14 @@
-﻿namespace Miruken.EntityFramework.Sqlite
+﻿namespace Miruken.EntityFramework.MySql
 {
     using System;
     using System.Collections.Generic;
-    using Microsoft.Data.Sqlite;
+    using global::MySql.Data.MySqlClient;
 
-    public static class SqliteParameterExtensions
+    public static class MySqlParameterExtensions
     {
-        public static ICollection<SqliteParameter> AddParameter(
-            this ICollection<SqliteParameter> paramList,
-            SqliteParameter                   param)
+        public static ICollection<MySqlParameter> AddParameter(
+            this ICollection<MySqlParameter> paramList,
+            MySqlParameter                   param)
         {
             if (paramList == null)
                 throw new ArgumentNullException(nameof(paramList));
@@ -23,12 +23,12 @@
             return paramList;
         }
 
-        public static ICollection<SqliteParameter> AddParameter(
-            this ICollection<SqliteParameter> paramList,
-            string                            paramName,
-            SqliteType                        type,
-            object                            value,
-            Action<SqliteParameter>           configure = null)
+        public static ICollection<MySqlParameter> AddParameter(
+            this ICollection<MySqlParameter> paramList,
+            string                           paramName,
+            MySqlDbType                      type,
+            object                           value,
+            Action<MySqlParameter>           configure = null)
         {
             if (paramList == null)
                 throw new ArgumentNullException(nameof(paramList));
@@ -39,22 +39,22 @@
                     "Cannot add parameters to a Read - Only Collection.");
             }
 
-            var param = new SqliteParameter
+            var param = new MySqlParameter
             {
                 ParameterName = paramName,
-                SqliteType    = type, 
+                MySqlDbType   = type, 
                 Value         = value ?? DBNull.Value
             };
             configure?.Invoke(param);
             return paramList.AddParameter(param);
         }
 
-        public static ICollection<SqliteParameter> AddParameter<T>(
-            this ICollection<SqliteParameter> paramList, 
-            string                            paramName, 
-            SqliteType                        type, 
-            T?                                value,
-            Action<SqliteParameter>           configure = null
+        public static ICollection<MySqlParameter> AddParameter<T>(
+            this ICollection<MySqlParameter> paramList, 
+            string                           paramName, 
+            MySqlDbType                      type, 
+            T?                               value,
+            Action<MySqlParameter>           configure = null
             ) where T : struct
         {
             if (paramList == null)
@@ -66,7 +66,7 @@
                     "Cannot add parameters to a Read - Only Collection.");
             }
 
-            var param = new SqliteParameter(paramName, type);
+            var param = new MySqlParameter(paramName, type);
 
             if (value.HasValue)
                 param.Value = value.Value;

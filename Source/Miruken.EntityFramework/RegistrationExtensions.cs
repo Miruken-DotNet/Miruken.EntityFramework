@@ -1,32 +1,27 @@
 ﻿namespace Miruken.EntityFramework
 {
     using System;
-    using Microsoft.EntityFrameworkCore;
-    using Microsoft.Extensions.DependencyInjection;
     using Register;
 
     public static class RegistrationExtensions
     {
         public static Registration WithEntityFrameworkCore(
-            this Registration registration, Type defaultDbContextOptions)
+            this Registration registration, Action<EntityFrameworkOptions> configure)
         {
             if (!registration.CanRegister(typeof(RegistrationExtensions)))
                 return registration;
 
-            if (defaultDbContextOptions == null)
-                throw new ArgumentNullException(nameof(defaultDbContextOptions),
-                    "A default DbContextOptions type must be specified");
-
-            if (!(defaultDbContextOptions.IsGenericTypeDefinition &&
-                  typeof(DbContextOptions).IsAssignableFrom(defaultDbContextOptions)))
-            {
-                throw new ArgumentException(
-                    $"{defaultDbContextOptions.FullName} does represent an open DbContextOptions class");
-            }
-
+            if (configure == null)
+                throw new ArgumentNullException(nameof(configure));
+            
             registration.Services(services =>
             {
-                services.AddSingleton(typeof(DbContextOptions<>), defaultDbContextOptions);
+                var options = new EntityFrameworkOptions(services);
+                configure(options);
+
+                if (!options.DefaultOptionsDefined)
+                    throw new InvalidOperationException(
+                        "A default DbContextOptions type must be specified.  Did you forget to call EntityFrameworkOptions.UseDefaultOptions");
             });
 
             return registration
