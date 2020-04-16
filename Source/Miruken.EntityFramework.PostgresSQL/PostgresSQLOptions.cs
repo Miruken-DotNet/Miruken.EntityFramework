@@ -34,7 +34,7 @@
                 builder.UseNpgsql(connectionString);
         }
 
-        public abstract class Options
+        public abstract class Options : IExtension<PostgresSQLOptions<T>>
         {
             public abstract void Configure(NpgsqlDbContextOptionsBuilder builder);
         }

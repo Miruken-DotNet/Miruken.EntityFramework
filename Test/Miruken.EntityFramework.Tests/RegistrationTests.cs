@@ -36,42 +36,19 @@
                     configure
                         .PublicSources(sources => sources.FromAssemblyOf<RegistrationTests>())
                         .WithEntityFrameworkCore(options => options
-                            .UseDefaultOptions(typeof(SqlServerOptions<>), typeof(ConfigureOptions<>))
-                            .UseDbContextOptions<SportsContext, SqliteOptions<SportsContext>>()
+                            .UseDefaultOptions(typeof(SqlServerOptions<>), typeof(ConfigureSqlServer<>))
+                            .UseDbContextOptions<SportsContext, SqliteOptions<SportsContext>, ConfigureSqlite<SportsContext>>()
                         )
                         .WithLogging();
                 }).Build();
 
             using var sportsContext = context.Create<SportsContext>();
             Assert.IsNotNull(sportsContext);
+            Assert.IsTrue(ConfigureSqlite<SportsContext>.Configured);
 
             using var customerContext = context.Create<CustomerContext>();
             Assert.IsNotNull(customerContext);
-            Assert.IsTrue(ConfigureOptions<CustomerContext>.Configured);
-        }
-
-        [TestMethod,
-         ExpectedException(typeof(ArgumentException))]
-        public void Should_Detect_Options_Configuration_Mismatch()
-        {
-            var configurationBuilder = new ConfigurationBuilder()
-                .AddInMemoryCollection(new Dictionary<string, string>
-                {
-                    ["ConnectionStrings:SportsContext"] =
-                        $"Data Source = sports_db_{Guid.NewGuid()}"
-                });
-
-            new ServiceCollection()
-                .AddSingleton(configurationBuilder.Build())
-                .AddMiruken(configure =>
-                {
-                    configure
-                        .PublicSources(sources => sources.FromAssemblyOf<RegistrationTests>())
-                        .WithEntityFrameworkCore(options => options
-                            .UseDbContextOptions<SportsContext, SqliteOptions<SportsContext>, ConfigureOptions<SportsContext>>()
-                        )
-                        .WithLogging();
-                }).Build();
+            Assert.IsTrue(ConfigureSqlServer<CustomerContext>.Configured);
         }
 
         public interface ICustomerContext : IDbContext { }
@@ -85,12 +62,23 @@
             }
         }
 
-        public class ConfigureOptions<T> : SqlServerOptions<T>.Options
+        public class ConfigureSqlServer<T> : SqlServerOptions<T>.Options
             where T : DbContext
         {
             public static  bool Configured { get; set; }
             
             public override void Configure(SqlServerDbContextOptionsBuilder builder)
+            {
+                Configured = true;
+            }
+        }
+
+        public class ConfigureSqlite<T> : SqliteOptions<T>.Options
+            where T : DbContext
+        {
+            public static bool Configured { get; set; }
+
+            public override void Configure(SqliteDbContextOptionsBuilder builder)
             {
                 Configured = true;
             }

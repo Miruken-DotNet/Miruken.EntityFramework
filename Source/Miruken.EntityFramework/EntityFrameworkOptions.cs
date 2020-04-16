@@ -52,6 +52,7 @@
         public EntityFrameworkOptions UseDbContextOptions<T, TO, TOC>()
             where T   : DbContext
             where TO  : DbContextOptions<T>
+            where TOC : IExtension<TO>
         {
             _services.AddSingleton<TO>();
             RegisterDbContextOptionsConfiguration(typeof(TO), typeof(TOC));

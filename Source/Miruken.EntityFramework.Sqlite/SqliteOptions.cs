@@ -34,7 +34,7 @@
                 builder.UseSqlite(connectionString);
         }
 
-        public abstract class Options
+        public abstract class Options : IExtension<SqliteOptions<T>>
         {
             public abstract void Configure(SqliteDbContextOptionsBuilder builder);
         }

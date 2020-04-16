@@ -34,7 +34,7 @@
                 builder.UseSqlServer(connectionString);
         }
 
-        public abstract class Options
+        public abstract class Options : IExtension<SqlServerOptions<T>>
         {
             public abstract void Configure(SqlServerDbContextOptionsBuilder builder);
         }

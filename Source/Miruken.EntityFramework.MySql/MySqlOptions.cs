@@ -35,7 +35,7 @@
         }
 
 
-        public abstract class Options
+        public abstract class Options : IExtension<MySqlOptions<T>>
         {
             public abstract void Configure(MySqlDbContextOptionsBuilder builder);
         }
