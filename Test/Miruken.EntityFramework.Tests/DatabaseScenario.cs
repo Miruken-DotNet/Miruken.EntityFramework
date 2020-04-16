@@ -49,7 +49,7 @@
             Context?.End();
         }
 
-        protected abstract void Setup(EntityFrameworkOptions options);
+        protected abstract void Setup(EntityFrameworkSetup setup);
 
         protected abstract void Configure(ConfigurationBuilder configuration, IServiceCollection   services);
     }

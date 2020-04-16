@@ -7,13 +7,13 @@
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.Logging;
 
-    public class MySqlOptions<T> : DbContextOptions<T>
+    public class UseMySql<T> : DbContextOptions<T>
         where T : DbContext
     {
-        public MySqlOptions(
+        public UseMySql(
             IConfiguration            configuration,
             [Optional] ILoggerFactory loggerFactory,
-            [Optional] Configure        configure)
+            [Optional] Configuration  configure)
             : base(configuration.
                 CreateDbContextExtensions<T, MySqlDbContextOptionsBuilder>(
                     UseSqlServer, loggerFactory,
@@ -34,8 +34,7 @@
                 builder.UseMySql(connectionString);
         }
 
-
-        public abstract class Configure : IExtension<MySqlOptions<T>>
+        public abstract class Configuration : IExtension<UseMySql<T>>
         {
             public abstract void Apply(MySqlDbContextOptionsBuilder builder);
         }

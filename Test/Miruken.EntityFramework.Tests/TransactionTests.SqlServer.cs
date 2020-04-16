@@ -10,9 +10,9 @@
     [TestClass]
     public class TransactionSqlServerTests : TransactionTests
     {
-        protected override void Setup(EntityFrameworkOptions options)
+        protected override void Setup(EntityFrameworkSetup setup)
         {
-            options.UseDefaultOptions(typeof(SqlServerOptions<>));
+            setup.DbContext(typeof(UseSqlServer<>));
         }
 
         protected override void Configure(

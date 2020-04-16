@@ -7,34 +7,33 @@
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.Logging;
 
-    public class SqlServerOptions<T> : DbContextOptions<T>
+    public class UseSqlServer<T> : DbContextOptions<T>
         where T : DbContext
     {
-        public SqlServerOptions(
+        public UseSqlServer(
                        IConfiguration configuration,
             [Optional] ILoggerFactory loggerFactory,
-            [Optional] Configure      configure)
+            [Optional] Configuration  configure)
             : base(configuration.
                 CreateDbContextExtensions<T, SqlServerDbContextOptionsBuilder>(
-                    UseSqlServer, loggerFactory,
-                    configure != null ? configure.Apply :
-                        (Action<SqlServerDbContextOptionsBuilder>)null))
+                    Setup, loggerFactory, configure != null ? configure.Apply
+                        : (Action<SqlServerDbContextOptionsBuilder>)null))
         {
         }
 
-        private static void UseSqlServer(
+        private static void Setup(
             DbContextOptionsBuilder                  builder,
             IConfiguration                           configuration,
             string                                   connectionString,
-            Action<SqlServerDbContextOptionsBuilder> options = null)
+            Action<SqlServerDbContextOptionsBuilder> configure = null)
         {
-            if (options != null)
-                builder.UseSqlServer(connectionString, options);
+            if (configure != null)
+                builder.UseSqlServer(connectionString, configure);
             else
                 builder.UseSqlServer(connectionString);
         }
 
-        public abstract class Configure : IExtension<SqlServerOptions<T>>
+        public abstract class Configuration : IExtension<UseSqlServer<T>>
         {
             public abstract void Apply(SqlServerDbContextOptionsBuilder builder);
         }

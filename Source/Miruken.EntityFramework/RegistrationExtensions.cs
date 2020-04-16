@@ -6,7 +6,7 @@
     public static class RegistrationExtensions
     {
         public static Registration WithEntityFrameworkCore(
-            this Registration registration, Action<EntityFrameworkOptions> configure)
+            this Registration registration, Action<EntityFrameworkSetup> configure)
         {
             if (!registration.CanRegister(typeof(RegistrationExtensions)))
                 return registration;
@@ -16,12 +16,9 @@
             
             registration.Services(services =>
             {
-                var options = new EntityFrameworkOptions(services);
-                configure(options);
-
-                if (!options.DefaultOptionsDefined)
-                    throw new InvalidOperationException(
-                        "A default DbContextOptions type must be specified.  Did you forget to call EntityFrameworkOptions.UseDefaultOptions");
+                var setup = new EntityFrameworkSetup(services);
+                configure(setup);
+                setup.Complete();
             });
 
             return registration

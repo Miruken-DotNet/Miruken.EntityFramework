@@ -7,34 +7,33 @@
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.Logging;
 
-    public class SqliteOptions<T> : DbContextOptions<T>
+    public class UseSqlite<T> : DbContextOptions<T>
         where T : DbContext
     {
-        public SqliteOptions(
+        public UseSqlite(
                        IConfiguration configuration,
             [Optional] ILoggerFactory loggerFactory,
-            [Optional] Configure      configure)
+            [Optional] Configuration  configure)
             : base(configuration.
                 CreateDbContextExtensions<T, SqliteDbContextOptionsBuilder>(
-                    UseSqlite, loggerFactory,
-                    configure != null ? configure.Apply :
-                        (Action<SqliteDbContextOptionsBuilder>)null))
+                    Setup, loggerFactory, configure != null ? configure.Apply
+                        : (Action<SqliteDbContextOptionsBuilder>)null))
         {
         }
 
-        private static void UseSqlite(
+        private static void Setup(
             DbContextOptionsBuilder               builder, 
             IConfiguration                        configuration,
             string                                connectionString,
-            Action<SqliteDbContextOptionsBuilder> options = null)
+            Action<SqliteDbContextOptionsBuilder> configure = null)
         {
-            if (options != null)
-                builder.UseSqlite(connectionString, options);
+            if (configure != null)
+                builder.UseSqlite(connectionString, configure);
             else
                 builder.UseSqlite(connectionString);
         }
 
-        public abstract class Configure : IExtension<SqliteOptions<T>>
+        public abstract class Configuration : IExtension<UseSqlite<T>>
         {
             public abstract void Apply(SqliteDbContextOptionsBuilder builder);
         }

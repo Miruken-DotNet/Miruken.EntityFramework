@@ -7,22 +7,21 @@
     using Microsoft.Extensions.Logging;
     using Npgsql.EntityFrameworkCore.PostgreSQL.Infrastructure;
 
-    public class PostgresSQLOptions<T> : DbContextOptions<T>
+    public class UsePostgresSQL<T> : DbContextOptions<T>
         where T : DbContext
     {
-        public PostgresSQLOptions(
+        public UsePostgresSQL(
                        IConfiguration configuration,
             [Optional] ILoggerFactory loggerFactory,
-            [Optional] Configure      configure)
+            [Optional] Configuration  configure)
             : base(configuration.
                 CreateDbContextExtensions<T, NpgsqlDbContextOptionsBuilder>(
-                    UsePostgresSQL, loggerFactory,
-                    configure != null ? configure.Apply :
-                        (Action<NpgsqlDbContextOptionsBuilder>)null))
+                    Setup, loggerFactory, configure != null ? configure.Apply
+                        : (Action<NpgsqlDbContextOptionsBuilder>)null))
         {
         }
 
-        private static void UsePostgresSQL(
+        private static void Setup(
             DbContextOptionsBuilder               builder,
             IConfiguration                        configuration,
             string                                connectionString,
@@ -34,7 +33,7 @@
                 builder.UseNpgsql(connectionString);
         }
 
-        public abstract class Configure : IExtension<PostgresSQLOptions<T>>
+        public abstract class Configuration : IExtension<UsePostgresSQL<T>>
         {
             public abstract void Apply(NpgsqlDbContextOptionsBuilder builder);
         }

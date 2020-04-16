@@ -12,9 +12,9 @@ namespace Miruken.EntityFramework.Tests
     {
         protected override bool SupportsNestedTransactions => true;
 
-        protected override void Setup(EntityFrameworkOptions options)
+        protected override void Setup(EntityFrameworkSetup setup)
         {
-            options.UseDefaultOptions(typeof(SqlServerOptions<>));
+            setup.DbContext(typeof(UseSqlServer<>));
         }
 
         protected override void Configure(

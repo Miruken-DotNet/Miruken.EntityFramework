@@ -10,9 +10,9 @@
     [TestClass]
     public class TransactionSqliteTests : TransactionTests
     {
-        protected override void Setup(EntityFrameworkOptions options)
+        protected override void Setup(EntityFrameworkSetup setup)
         {
-            options.UseDefaultOptions(typeof(SqliteOptions<>));
+            setup.DbContext(typeof(UseSqlite<>));
         }
 
         protected override void Configure(
