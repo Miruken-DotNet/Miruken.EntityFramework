@@ -13,11 +13,11 @@
         public PostgresSQLOptions(
                        IConfiguration configuration,
             [Optional] ILoggerFactory loggerFactory,
-            [Optional] Options        options)
+            [Optional] Configure      configure)
             : base(configuration.
                 CreateDbContextExtensions<T, NpgsqlDbContextOptionsBuilder>(
                     UsePostgresSQL, loggerFactory,
-                    options != null ? options.Configure :
+                    configure != null ? configure.Apply :
                         (Action<NpgsqlDbContextOptionsBuilder>)null))
         {
         }
@@ -34,9 +34,9 @@
                 builder.UseNpgsql(connectionString);
         }
 
-        public abstract class Options : IExtension<PostgresSQLOptions<T>>
+        public abstract class Configure : IExtension<PostgresSQLOptions<T>>
         {
-            public abstract void Configure(NpgsqlDbContextOptionsBuilder builder);
+            public abstract void Apply(NpgsqlDbContextOptionsBuilder builder);
         }
     }
 }

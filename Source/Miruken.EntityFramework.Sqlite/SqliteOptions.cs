@@ -13,11 +13,11 @@
         public SqliteOptions(
                        IConfiguration configuration,
             [Optional] ILoggerFactory loggerFactory,
-            [Optional] Options        options)
+            [Optional] Configure      configure)
             : base(configuration.
                 CreateDbContextExtensions<T, SqliteDbContextOptionsBuilder>(
                     UseSqlite, loggerFactory,
-                    options != null ? options.Configure :
+                    configure != null ? configure.Apply :
                         (Action<SqliteDbContextOptionsBuilder>)null))
         {
         }
@@ -34,9 +34,9 @@
                 builder.UseSqlite(connectionString);
         }
 
-        public abstract class Options : IExtension<SqliteOptions<T>>
+        public abstract class Configure : IExtension<SqliteOptions<T>>
         {
-            public abstract void Configure(SqliteDbContextOptionsBuilder builder);
+            public abstract void Apply(SqliteDbContextOptionsBuilder builder);
         }
     }
 }

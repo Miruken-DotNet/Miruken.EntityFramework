@@ -62,23 +62,23 @@
             }
         }
 
-        public class ConfigureSqlServer<T> : SqlServerOptions<T>.Options
+        public class ConfigureSqlServer<T> : SqlServerOptions<T>.Configure
             where T : DbContext
         {
             public static  bool Configured { get; set; }
             
-            public override void Configure(SqlServerDbContextOptionsBuilder builder)
+            public override void Apply(SqlServerDbContextOptionsBuilder builder)
             {
                 Configured = true;
             }
         }
 
-        public class ConfigureSqlite<T> : SqliteOptions<T>.Options
+        public class ConfigureSqlite<T> : SqliteOptions<T>.Configure
             where T : DbContext
         {
             public static bool Configured { get; set; }
 
-            public override void Configure(SqliteDbContextOptionsBuilder builder)
+            public override void Apply(SqliteDbContextOptionsBuilder builder)
             {
                 Configured = true;
             }

@@ -67,7 +67,7 @@
             if (optionsType == null)
             {
                 throw new ArgumentException(
-                    $"'{dbContextOptions.FullName}' does not define a nested Options class");
+                    $"'{dbContextOptions.FullName}' does not define a nested Configure class");
             }
 
             if (optionsType.IsGenericTypeDefinition)
@@ -76,13 +76,13 @@
                 if (conformance == null)
                 {
                     throw new ArgumentException(
-                        $"'{dbContextOptionsConfiguration.FullName}' does not conform to open Options type '{optionsType.FullName}'");
+                        $"'{dbContextOptionsConfiguration.FullName}' does not conform to open Configure type '{optionsType.FullName}'");
                 }
             }
             else if (!optionsType.IsAssignableFrom(dbContextOptionsConfiguration))
             {
                 throw new ArgumentException(
-                    $"'{dbContextOptionsConfiguration.FullName}' is not an instance of the Options type '{optionsType.FullName}'");
+                    $"'{dbContextOptionsConfiguration.FullName}' is not an instance of the Configure type '{optionsType.FullName}'");
             }
 
             _services.AddSingleton(optionsType, dbContextOptionsConfiguration);
@@ -90,6 +90,6 @@
 
         private static Type FindOptionsType(Type defaultDbContextOptions) =>
             defaultDbContextOptions.GetNestedTypes()
-                .First(t => t.Name == "Options");
+                .First(t => t.Name == "Configure");
     }
 }

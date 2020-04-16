@@ -13,11 +13,11 @@
         public SqlServerOptions(
                        IConfiguration configuration,
             [Optional] ILoggerFactory loggerFactory,
-            [Optional] Options        options)
+            [Optional] Configure      configure)
             : base(configuration.
                 CreateDbContextExtensions<T, SqlServerDbContextOptionsBuilder>(
                     UseSqlServer, loggerFactory,
-                    options != null ? options.Configure :
+                    configure != null ? configure.Apply :
                         (Action<SqlServerDbContextOptionsBuilder>)null))
         {
         }
@@ -34,9 +34,9 @@
                 builder.UseSqlServer(connectionString);
         }
 
-        public abstract class Options : IExtension<SqlServerOptions<T>>
+        public abstract class Configure : IExtension<SqlServerOptions<T>>
         {
-            public abstract void Configure(SqlServerDbContextOptionsBuilder builder);
+            public abstract void Apply(SqlServerDbContextOptionsBuilder builder);
         }
     }
 }

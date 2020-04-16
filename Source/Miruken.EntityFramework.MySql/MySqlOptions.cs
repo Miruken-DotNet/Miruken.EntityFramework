@@ -13,11 +13,11 @@
         public MySqlOptions(
             IConfiguration            configuration,
             [Optional] ILoggerFactory loggerFactory,
-            [Optional] Options        options)
+            [Optional] Configure        configure)
             : base(configuration.
                 CreateDbContextExtensions<T, MySqlDbContextOptionsBuilder>(
                     UseSqlServer, loggerFactory,
-                    options != null ? options.Configure :
+                    configure != null ? configure.Apply :
                         (Action<MySqlDbContextOptionsBuilder>)null))
         {
         }
@@ -35,9 +35,9 @@
         }
 
 
-        public abstract class Options : IExtension<MySqlOptions<T>>
+        public abstract class Configure : IExtension<MySqlOptions<T>>
         {
-            public abstract void Configure(MySqlDbContextOptionsBuilder builder);
+            public abstract void Apply(MySqlDbContextOptionsBuilder builder);
         }
     }
 }
