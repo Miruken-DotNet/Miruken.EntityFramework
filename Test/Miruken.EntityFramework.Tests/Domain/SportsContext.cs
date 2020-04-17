@@ -1,7 +1,6 @@
-﻿namespace Miruken.EntityFramework.Tests
+﻿namespace Miruken.EntityFramework.Tests.Domain
 {
     using Callback;
-    using Domain;
     using Microsoft.EntityFrameworkCore;
 
     public interface ISportsContext : IDbContext { }

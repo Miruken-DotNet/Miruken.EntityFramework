@@ -11,7 +11,7 @@ namespace Miruken.EntityFramework.Tests
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using Miruken.Api;
 
-    public abstract class UnitOfWorkTests : DatabaseScenario
+    public abstract class UnitOfWorkScenario : DatabaseScenario
     {
         protected virtual bool SupportsNestedTransactions => false;
 

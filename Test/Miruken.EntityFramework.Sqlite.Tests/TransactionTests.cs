@@ -1,28 +1,28 @@
-﻿namespace Miruken.EntityFramework.Tests
+﻿namespace Miruken.EntityFramework.Sqlite.Tests
 {
     using System;
     using System.Collections.Generic;
+    using EntityFramework.Tests;
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
-    using SqlServer;
+    using Sqlite;
 
     [TestClass]
-    public class TransactionSqlServerTests : TransactionTests
+    public class TransactionTests : TransactionScenario
     {
         protected override void Setup(EntityFrameworkSetup setup)
         {
-            setup.DbContext(typeof(UseSqlServer<>));
+            setup.DbContext(typeof(UseSqlite<>));
         }
 
         protected override void Configure(
             ConfigurationBuilder configuration,
-            IServiceCollection   services)
+            IServiceCollection    services)
         {
             configuration.AddInMemoryCollection(new Dictionary<string, string>
             {
-                ["ConnectionStrings:SportsContext"] =
-                    $"Server=(LocalDB)\\MSSQLLocalDB;Database=sports_db_{Guid.NewGuid()};Trusted_Connection=True;MultipleActiveResultSets=true",
+                ["ConnectionStrings:SportsContext"] = $"Data Source = sports_db_{Guid.NewGuid()}",
             });
         }
     }

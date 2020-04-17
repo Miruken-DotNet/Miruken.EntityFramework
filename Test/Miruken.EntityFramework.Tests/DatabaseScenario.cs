@@ -1,7 +1,10 @@
 ﻿namespace Miruken.EntityFramework.Tests
 {
+    using System.Collections.Generic;
+    using System.Linq;
     using Callback;
     using Context;
+    using Domain;
     using Log;
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
@@ -29,7 +32,7 @@
                 .AddMiruken(configure =>
                 {
                     configure
-                        .PublicSources(sources => sources.FromAssemblyOf<UnitOfWorkTests>())
+                        .PublicSources(GetSources().ToArray())
                         .WithEntityFrameworkCore(Setup)
                         .WithLogging();
                 }).Build();
@@ -50,7 +53,17 @@
         }
 
         protected abstract void Setup(EntityFrameworkSetup setup);
-
+        
         protected abstract void Configure(ConfigurationBuilder configuration, IServiceCollection   services);
+
+        protected virtual IEnumerable<Registration.SourceSelector> GetSources()
+        {
+            var domain = typeof(DatabaseScenario).Assembly;
+            yield return source => source.FromAssemblies(domain);
+
+            var test = GetType().Assembly;
+            if (test != domain)
+                yield return source => source.FromAssemblies(test);
+        }
     }
 }

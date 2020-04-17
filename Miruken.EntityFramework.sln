@@ -15,6 +15,14 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Miruken.EntityFramework.Pos
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Miruken.EntityFramework.MySql", "Source\Miruken.EntityFramework.MySql\Miruken.EntityFramework.MySql.csproj", "{35CFEC2E-38D8-425E-98C5-5A61A6755AB0}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Miruken.EntityFramework.Sqlite.Tests", "Test\Miruken.EntityFramework.Sqlite.Tests\Miruken.EntityFramework.Sqlite.Tests.csproj", "{849B6D58-5590-4881-AE19-15B7BB71EFB1}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{223C8E48-F60A-41DF-A765-A9FFF0B79410}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Miruken.EntityFramework.SqlServer.Tests", "Test\Miruken.EntityFramework.SqlServer.Tests\Miruken.EntityFramework.SqlServer.Tests.csproj", "{B6D1EF48-2E26-4C36-AF4B-17295605A4EB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Miruken.EntityFramework.Registration.Tests", "Test\Miruken.EntityFramework.Registration.Tests\Miruken.EntityFramework.Registration.Tests.csproj", "{C7B40B6D-02A7-4552-A0AE-AD825505CB03}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -45,11 +53,29 @@ Global
 		{35CFEC2E-38D8-425E-98C5-5A61A6755AB0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{35CFEC2E-38D8-425E-98C5-5A61A6755AB0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{35CFEC2E-38D8-425E-98C5-5A61A6755AB0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{849B6D58-5590-4881-AE19-15B7BB71EFB1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{849B6D58-5590-4881-AE19-15B7BB71EFB1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{849B6D58-5590-4881-AE19-15B7BB71EFB1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{849B6D58-5590-4881-AE19-15B7BB71EFB1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B6D1EF48-2E26-4C36-AF4B-17295605A4EB}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B6D1EF48-2E26-4C36-AF4B-17295605A4EB}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B6D1EF48-2E26-4C36-AF4B-17295605A4EB}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B6D1EF48-2E26-4C36-AF4B-17295605A4EB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C7B40B6D-02A7-4552-A0AE-AD825505CB03}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C7B40B6D-02A7-4552-A0AE-AD825505CB03}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C7B40B6D-02A7-4552-A0AE-AD825505CB03}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C7B40B6D-02A7-4552-A0AE-AD825505CB03}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {5135B163-D0E9-4F46-B5BE-EAFA54699127}
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{849B6D58-5590-4881-AE19-15B7BB71EFB1} = {223C8E48-F60A-41DF-A765-A9FFF0B79410}
+		{026242DB-0B41-468B-8904-7C69C95F52FE} = {223C8E48-F60A-41DF-A765-A9FFF0B79410}
+		{B6D1EF48-2E26-4C36-AF4B-17295605A4EB} = {223C8E48-F60A-41DF-A765-A9FFF0B79410}
+		{C7B40B6D-02A7-4552-A0AE-AD825505CB03} = {223C8E48-F60A-41DF-A765-A9FFF0B79410}
 	EndGlobalSection
 EndGlobal

@@ -1,8 +1,11 @@
-﻿namespace Miruken.EntityFramework.Tests
+﻿// ReSharper disable All
+namespace Miruken.EntityFramework.Registration.Tests
 {
     using System;
     using System.Collections.Generic;
     using Callback;
+    using EntityFramework.Tests;
+    using EntityFramework.Tests.Domain;
     using Log;
     using Microsoft.EntityFrameworkCore;
     using Microsoft.EntityFrameworkCore.Infrastructure;
@@ -42,7 +45,9 @@
                 .AddMiruken(configure =>
                 {
                     configure
-                        .PublicSources(sources => sources.FromAssemblyOf<RegistrationTests>())
+                        .PublicSources(
+                            sources => sources.FromAssemblyOf<RegistrationTests>(),
+                            sources => sources.FromAssemblyOf<DatabaseScenario>())
                         .WithEntityFrameworkCore(setup => setup
                             .DbContext<UseSqlite<SportsContext>>()
                         )
@@ -61,7 +66,9 @@
                 .AddMiruken(configure =>
                 {
                     configure
-                        .PublicSources(sources => sources.FromAssemblyOf<RegistrationTests>())
+                        .PublicSources(
+                            sources => sources.FromAssemblyOf<RegistrationTests>(),
+                            sources => sources.FromAssemblyOf<DatabaseScenario>())
                         .WithEntityFrameworkCore(setup => setup
                             .DbContext<UseSqlite<SportsContext>, ConfigureSqlite<SportsContext>>()
                         )
@@ -81,7 +88,9 @@
                 .AddMiruken(configure =>
                 {
                     configure
-                        .PublicSources(sources => sources.FromAssemblyOf<RegistrationTests>())
+                        .PublicSources(
+                            sources => sources.FromAssemblyOf<RegistrationTests>(),
+                            sources => sources.FromAssemblyOf<DatabaseScenario>())
                         .WithEntityFrameworkCore(setup => setup
                             .UseSqlServer<SportsContext>()
                         )
@@ -101,7 +110,9 @@
                 .AddMiruken(configure =>
                 {
                     configure
-                        .PublicSources(sources => sources.FromAssemblyOf<RegistrationTests>())
+                        .PublicSources(
+                            sources => sources.FromAssemblyOf<RegistrationTests>(),
+                            sources => sources.FromAssemblyOf<DatabaseScenario>())
                         .WithEntityFrameworkCore(setup => setup
                             .UseSqlServer<SportsContext>(_ => customized = true)
                         )
@@ -121,7 +132,9 @@
                 .AddMiruken(configure =>
                 {
                     configure
-                        .PublicSources(sources => sources.FromAssemblyOf<RegistrationTests>())
+                        .PublicSources(
+                            sources => sources.FromAssemblyOf<RegistrationTests>(),
+                            sources => sources.FromAssemblyOf<DatabaseScenario>())
                         .WithEntityFrameworkCore(setup => setup
                             .UseSqlite<SportsContext, ConfigureSqlite<SportsContext>>()
                             .DbContext(typeof(UseSqlServer<>), typeof(ConfigureSqlServer<>))
@@ -147,7 +160,9 @@
                 .AddMiruken(configure =>
                 {
                     configure
-                        .PublicSources(sources => sources.FromAssemblyOf<RegistrationTests>())
+                        .PublicSources(
+                            sources => sources.FromAssemblyOf<RegistrationTests>(),
+                            sources => sources.FromAssemblyOf<DatabaseScenario>())
                         .WithEntityFrameworkCore(setup => setup
                             .UseSqlite<SportsContext>()
                             .UseSqlServer<SportsContext>()
@@ -165,7 +180,9 @@
                 .AddMiruken(configure =>
                 {
                     configure
-                        .PublicSources(sources => sources.FromAssemblyOf<RegistrationTests>())
+                        .PublicSources(
+                            sources => sources.FromAssemblyOf<RegistrationTests>(),
+                            sources => sources.FromAssemblyOf<DatabaseScenario>())
                         .WithEntityFrameworkCore(setup => setup
                             .DbContext(typeof(UseSqlServer<>))
                             .DbContext(typeof(UseSqlite<>))
@@ -183,7 +200,9 @@
                 .AddMiruken(configure =>
                 {
                     configure
-                        .PublicSources(sources => sources.FromAssemblyOf<RegistrationTests>())
+                        .PublicSources(
+                            sources => sources.FromAssemblyOf<RegistrationTests>(),
+                            sources => sources.FromAssemblyOf<DatabaseScenario>())
                         .WithEntityFrameworkCore(setup => setup
                             .DbContext<DbContextOptions>()
                         )
@@ -200,7 +219,9 @@
                 .AddMiruken(configure =>
                 {
                     configure
-                        .PublicSources(sources => sources.FromAssemblyOf<RegistrationTests>())
+                        .PublicSources(
+                            sources => sources.FromAssemblyOf<RegistrationTests>(),
+                            sources => sources.FromAssemblyOf<DatabaseScenario>())
                         .WithEntityFrameworkCore(setup => setup
                             .DbContext(typeof(UseSqlite<SportsContext>), typeof(ConfigureSqlServer<SportsContext>))
                         )

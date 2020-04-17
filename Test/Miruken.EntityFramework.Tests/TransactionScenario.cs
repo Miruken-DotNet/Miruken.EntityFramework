@@ -8,7 +8,7 @@
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using Miruken.Api;
 
-    public abstract class TransactionTests : DatabaseScenario
+    public abstract class TransactionScenario : DatabaseScenario
     {
         [TestMethod]
         public async Task Should_Require_Existing_Transaction()

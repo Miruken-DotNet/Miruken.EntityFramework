@@ -1,18 +1,21 @@
-namespace Miruken.EntityFramework.Tests
+namespace Miruken.EntityFramework.SqlServer.Tests
 {
     using System;
     using System.Collections.Generic;
+    using EntityFramework.Tests;
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
-    using Sqlite;
+    using SqlServer;
 
     [TestClass]
-    public class UnitOfWorkSqliteTests : UnitOfWorkTests
+    public class UnitOfWorkTests : UnitOfWorkScenario
     {
+        protected override bool SupportsNestedTransactions => true;
+
         protected override void Setup(EntityFrameworkSetup setup)
         {
-            setup.DbContext(typeof(UseSqlite<>));
+            setup.DbContext(typeof(UseSqlServer<>));
         }
 
         protected override void Configure(
@@ -21,7 +24,8 @@ namespace Miruken.EntityFramework.Tests
         {
             configuration.AddInMemoryCollection(new Dictionary<string, string>
             {
-                ["ConnectionStrings:SportsContext"] = $"Data Source = sports_db_{Guid.NewGuid()}",
+                ["ConnectionStrings:SportsContext"] =
+                    $"Server=(LocalDB)\\MSSQLLocalDB;Database=sports_db_{Guid.NewGuid()};Trusted_Connection=True;MultipleActiveResultSets=true",
             });
         }
     }

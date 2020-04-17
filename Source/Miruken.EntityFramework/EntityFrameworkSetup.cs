@@ -56,13 +56,11 @@
                 in _bindings.Values.OrderBy(x => x.Item1))
             {
                 _services.AddSingleton(provider);
-                if (configuration != null)
-                {
-                    if (configuration.IsGenericTypeDefinition)
-                        _services.AddSingleton(openConfiguration, configuration);
-                    else
-                        _services.AddSingleton(configuration);
-                }
+                if (configuration == null) continue;
+                if (configuration.IsGenericTypeDefinition)
+                    _services.AddSingleton(openConfiguration, configuration);
+                else
+                    _services.AddSingleton(configuration);
             }
         }
 
