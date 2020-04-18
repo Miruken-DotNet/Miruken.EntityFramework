@@ -1,4 +1,5 @@
-﻿namespace Miruken.EntityFramework.PostgresSQL
+﻿// ReSharper disable InconsistentNaming
+namespace Miruken.EntityFramework.PostgresSQL
 {
     using System;
     using System.Collections.Generic;

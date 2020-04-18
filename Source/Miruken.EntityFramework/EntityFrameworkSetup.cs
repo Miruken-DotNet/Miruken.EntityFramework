@@ -119,6 +119,7 @@
 
             _bindings.Add(dbContextType,
                 (
+                    // Ensure default (open) provider comes first
                     dbContextProviderType.IsGenericTypeDefinition ? 0 : _bindings.Count + 1,
                     dbContextProviderType,
                     dbContextConfigurationType,

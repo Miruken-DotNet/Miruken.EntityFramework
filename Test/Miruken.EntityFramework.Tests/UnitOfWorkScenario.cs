@@ -13,8 +13,11 @@ namespace Miruken.EntityFramework.Tests
 
     public abstract class UnitOfWorkScenario : DatabaseScenario
     {
-        protected virtual bool SupportsNestedTransactions => false;
-
+        protected UnitOfWorkScenario(DatabaseSetup databaseSetup)
+            : base(databaseSetup)
+        {
+        }
+        
         [TestMethod]
         public async Task Should_Create_Read_Update()
         {
@@ -25,7 +28,7 @@ namespace Miruken.EntityFramework.Tests
 
             await using (var context = Context.Create<SportsContext>())
             {
-                await using var transaction = context.Database.BeginTransaction();
+                await using var transaction = await context.Database.BeginTransactionAsync();
                 context.Add(team);
                 await context.SaveChangesAsync();
                 await transaction.CommitAsync();
@@ -37,7 +40,7 @@ namespace Miruken.EntityFramework.Tests
                     .ExecuteAsync(context)).Single();
                 fetchTeam.Name = "Matthew";
                 await context.SaveChangesAsync();
-                await using var transaction = context.Database.BeginTransaction();
+                await using var transaction = await context.Database.BeginTransactionAsync();
                 await context.SaveChangesAsync();
                 await transaction.CommitAsync();
             }
@@ -49,10 +52,10 @@ namespace Miruken.EntityFramework.Tests
                 Assert.AreEqual("Matthew", fetchTeam.Name);
             }
 
-            if (SupportsNestedTransactions)
+            if (DatabaseSetup.SupportsNestedTransactions)
             {
                 await using var context = Context.Create<SportsContext>();
-                await using var transaction = context.Database.BeginTransaction();
+                await using var transaction = await context.Database.BeginTransactionAsync();
                 var fetchTeam = (await new QueryTeam.ById(team.Id)
                     .ExecuteAsync(context)).Single();
                 fetchTeam.Name = "John";
@@ -78,25 +81,25 @@ namespace Miruken.EntityFramework.Tests
             {
                 Team = new TeamData
                 {
-                    Name = "Breakaway",
+                    Name  = "Breakaway",
                     Coach = new PersonData
                     {
-                        FirstName = "Doug",
-                        LastName = "Collins",
+                        FirstName   = "Doug",
+                        LastName    = "Collins",
                         DateOfBirth = new DateTime(1978, 5, 20)
                     },
                     Players = new[]
                     {
                         new PersonData
                         {
-                            FirstName = "Austin",
-                            LastName = "Branch",
+                            FirstName   = "Austin",
+                            LastName    = "Branch",
                             DateOfBirth = new DateTime(2007, 3, 8)
                         },
                         new PersonData
                         {
                             FirstName = "Thomas",
-                            LastName = "Smith",
+                            LastName  = "Smith",
                             DateOfBirth = new DateTime(2008, 4, 15)
                         }
                     }
@@ -131,25 +134,25 @@ namespace Miruken.EntityFramework.Tests
             {
                 Team = new TeamData
                 {
-                    Name = "JuventusXX",
+                    Name  = "JuventusXX",
                     Coach = new PersonData
                     {
-                        FirstName = "Maurizio",
-                        LastName = "Sarri",
+                        FirstName   = "Maurizio",
+                        LastName    = "Sarri",
                         DateOfBirth = new DateTime(1960, 1, 10)
                     },
                     Players = new[]
                     {
                         new PersonData
                         {
-                            FirstName = "Cristiano",
-                            LastName = "Ronaldo",
+                            FirstName   = "Cristiano",
+                            LastName    = "Ronaldo",
                             DateOfBirth = new DateTime(1985, 2, 5)
                         },
                         new PersonData
                         {
-                            FirstName = "Paulo",
-                            LastName = "Dybala",
+                            FirstName   = "Paulo",
+                            LastName    = "Dybala",
                             DateOfBirth = new DateTime(1993, 11, 15)
                         }
                     }
@@ -171,11 +174,11 @@ namespace Miruken.EntityFramework.Tests
 
             var updateTeam = new TeamData
             {
-                Id = team.Id,
-                Name = "Juventus",
+                Id    = team.Id,
+                Name  = "Juventus",
                 Coach = new PersonData
                 {
-                    Id = fetchTeam.Coach.Id,
+                    Id          = fetchTeam.Coach.Id,
                     DateOfBirth = new DateTime(1959, 1, 10)
                 },
                 Players = new[] {new PersonData {Id = -ronaldo.Id}}

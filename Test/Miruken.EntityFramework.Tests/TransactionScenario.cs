@@ -10,6 +10,11 @@
 
     public abstract class TransactionScenario : DatabaseScenario
     {
+        protected TransactionScenario(DatabaseSetup databaseSetup)
+            : base(databaseSetup)
+        {
+        }
+        
         [TestMethod]
         public async Task Should_Require_Existing_Transaction()
         {

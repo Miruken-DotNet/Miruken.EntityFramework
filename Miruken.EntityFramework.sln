@@ -23,6 +23,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Miruken.EntityFramework.Sql
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Miruken.EntityFramework.Registration.Tests", "Test\Miruken.EntityFramework.Registration.Tests\Miruken.EntityFramework.Registration.Tests.csproj", "{C7B40B6D-02A7-4552-A0AE-AD825505CB03}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Miruken.EntityFramework.PostgresSQL.Tests", "Test\Miruken.EntityFramework.PostgresSQL.Tests\Miruken.EntityFramework.PostgresSQL.Tests.csproj", "{4A8A0F80-E0EB-4C24-834C-9852826E8409}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -65,6 +67,10 @@ Global
 		{C7B40B6D-02A7-4552-A0AE-AD825505CB03}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C7B40B6D-02A7-4552-A0AE-AD825505CB03}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C7B40B6D-02A7-4552-A0AE-AD825505CB03}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4A8A0F80-E0EB-4C24-834C-9852826E8409}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4A8A0F80-E0EB-4C24-834C-9852826E8409}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4A8A0F80-E0EB-4C24-834C-9852826E8409}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4A8A0F80-E0EB-4C24-834C-9852826E8409}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -77,5 +83,6 @@ Global
 		{026242DB-0B41-468B-8904-7C69C95F52FE} = {223C8E48-F60A-41DF-A765-A9FFF0B79410}
 		{B6D1EF48-2E26-4C36-AF4B-17295605A4EB} = {223C8E48-F60A-41DF-A765-A9FFF0B79410}
 		{C7B40B6D-02A7-4552-A0AE-AD825505CB03} = {223C8E48-F60A-41DF-A765-A9FFF0B79410}
+		{4A8A0F80-E0EB-4C24-834C-9852826E8409} = {223C8E48-F60A-41DF-A765-A9FFF0B79410}
 	EndGlobalSection
 EndGlobal

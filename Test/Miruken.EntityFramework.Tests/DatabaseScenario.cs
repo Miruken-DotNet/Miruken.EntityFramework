@@ -1,7 +1,9 @@
 ﻿namespace Miruken.EntityFramework.Tests
 {
+    using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Threading.Tasks;
     using Callback;
     using Context;
     using Domain;
@@ -14,18 +16,38 @@
 
     public abstract class DatabaseScenario
     {
-        private SportsContext _context;
-
+        private SportsContext _dbContext;
+        
+        protected DatabaseScenario(DatabaseSetup databaseSetup)
+        {
+            DatabaseSetup = databaseSetup
+                ?? throw new ArgumentNullException(nameof(databaseSetup));
+        }
+      
         protected Context Context;
 
-        [TestInitialize]
-        public void TestInitialize()
+        protected DatabaseSetup DatabaseSetup { get; }
+        
+        protected abstract void Setup(EntityFrameworkSetup setup);
+        
+        protected virtual IEnumerable<Registration.SourceSelector> GetSources()
         {
-            var services = new ServiceCollection();
+            var domain = typeof(DatabaseScenario).Assembly;
+            yield return source => source.FromAssemblies(domain);
 
+            var test = GetType().Assembly;
+            if (test != domain)
+                yield return source => source.FromAssemblies(test);
+        }
+        
+        [TestInitialize]
+        public async Task TestInitialize()
+        {
+            var services             = new ServiceCollection();
             var configurationBuilder = new ConfigurationBuilder();
-            Configure(configurationBuilder, services);
 
+            await DatabaseSetup.Setup(configurationBuilder, services);
+            
             Context = services
                 .AddLogging()
                 .AddSingleton(configurationBuilder.Build())
@@ -36,34 +58,39 @@
                         .WithEntityFrameworkCore(Setup)
                         .WithLogging();
                 }).Build();
-
-            _context = Context.Create<SportsContext>();
-            _context.Database.EnsureCreated();
+            
+            _dbContext = Context.Create<SportsContext>();
+            
+            await _dbContext.Database.EnsureCreatedAsync();
         }
-
+        
         [TestCleanup]
-        public void TestCleanup()
+        public async Task TestCleanup()
         {
-            using (_context)
+            try
             {
-                _context?.Database.EnsureDeleted();
+                await using (_dbContext)
+                {
+                    if (_dbContext != null)
+                        await _dbContext.Database.EnsureDeletedAsync();
+                }
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                throw;
+            }
+
+            try
+            {
+                await DatabaseSetup.DisposeAsync();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
             }
 
             Context?.End();
-        }
-
-        protected abstract void Setup(EntityFrameworkSetup setup);
-        
-        protected abstract void Configure(ConfigurationBuilder configuration, IServiceCollection   services);
-
-        protected virtual IEnumerable<Registration.SourceSelector> GetSources()
-        {
-            var domain = typeof(DatabaseScenario).Assembly;
-            yield return source => source.FromAssemblies(domain);
-
-            var test = GetType().Assembly;
-            if (test != domain)
-                yield return source => source.FromAssemblies(test);
         }
     }
 }
