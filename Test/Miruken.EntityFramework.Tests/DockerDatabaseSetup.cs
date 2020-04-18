@@ -124,7 +124,7 @@ namespace Miruken.EntityFramework.Tests
             if (pgImage == null)
             {
                 Debug.WriteLine($"Pulling docker image {_imageName}");
-                await _docker.Images.CreateImageAsync(new ImagesCreateParameters()
+                await _docker.Images.CreateImageAsync(new ImagesCreateParameters
                 {
                     FromImage = _image,
                     Tag       = _tag

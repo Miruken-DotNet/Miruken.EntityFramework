@@ -1,26 +1,23 @@
 // ReSharper disable InconsistentNaming
-namespace Miruken.EntityFramework.SqlServer.Tests
+namespace Miruken.EntityFramework.MySql.Tests
 {
-    using System;
     using System.Collections.Generic;
     using System.Threading.Tasks;
     using Docker.DotNet.Models;
     using EntityFramework.Tests;
-    using Microsoft.Data.SqlClient;
+    using global::MySql.Data.MySqlClient;
     using Microsoft.Extensions.Configuration;
 
-    public class SqlServerDockerSetup : DockerDatabaseSetup
+    public class MySqlSetup : DockerDatabaseSetup
     {
         private const string Database = "miruken";
-        private const string Password = "I@mJustT3st1ing";
-        private const int    Port     = 1433;
+        private const string Password = "rootpwd123";
+        private const int    Port     = 3306;
         
-        public SqlServerDockerSetup() : base("mcr.microsoft.com/mssql/server", "2019-latest", Port)
+        public MySqlSetup() : base("mysql", "8.0.19", Port)
         {
         }
 
-        protected override TimeSpan TimeOut => TimeSpan.FromSeconds(120);
-        
         protected override CreateContainerParameters ConfigureContainer(
             ConfigurationBuilder configuration, int externalPort)
         {
@@ -33,8 +30,7 @@ namespace Miruken.EntityFramework.SqlServer.Tests
             {
                 Env = new []
                 {
-                    "ACCEPT_EULA=Y",
-                    $"SA_PASSWORD={Password}"
+                    $"MYSQL_ROOT_PASSWORD={Password}"
                 }
             };
         }
@@ -43,7 +39,7 @@ namespace Miruken.EntityFramework.SqlServer.Tests
         {
             try
             {
-                await using var connection = new SqlConnection(BuildConnectionString(externalPort, "master"));
+                await using var connection = new MySqlConnection(BuildConnectionString(externalPort, "mysql"));
                 await connection.OpenAsync();
                 return true;
             }
@@ -54,6 +50,6 @@ namespace Miruken.EntityFramework.SqlServer.Tests
         }
 
         private static string BuildConnectionString(int externalPort, string database) =>
-            $"Server=127.0.0.1,{externalPort};Database={database};User Id=sa;Password={Password};";
+            $"Server=127.0.0.1;Port={externalPort};Database={database};User=root;Password={Password};";
     }
 }

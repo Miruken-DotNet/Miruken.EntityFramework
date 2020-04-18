@@ -29,8 +29,7 @@ namespace Miruken.EntityFramework.PostgresSQL.Tests
 
             return new CreateContainerParameters
             {
-                User = UserId,
-                Env  = new []
+                Env = new []
                 {
                     $"POSTGRES_PASSWORD={Password}",
                     $"POSTGRES_DB={Database}",
