@@ -47,10 +47,12 @@
             var configurationBuilder = new ConfigurationBuilder();
 
             await DatabaseSetup.Setup(configurationBuilder, services);
+
+            var configuration = configurationBuilder.Build();
             
             Context = services
                 .AddLogging()
-                .AddSingleton(configurationBuilder.Build())
+                .AddSingleton(configuration)
                 .AddMiruken(configure =>
                 {
                     configure

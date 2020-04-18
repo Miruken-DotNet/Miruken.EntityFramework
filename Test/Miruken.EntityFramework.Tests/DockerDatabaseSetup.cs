@@ -20,7 +20,7 @@ namespace Miruken.EntityFramework.Tests
         private readonly string _imageName;
         private readonly int _internalPort;
         private IDockerClient _docker;
-        private CreateContainerResponse _containerResponse;
+        private string _containerId;
 
         protected DockerDatabaseSetup(string image, string tag, int internalPort)
         {
@@ -31,6 +31,10 @@ namespace Miruken.EntityFramework.Tests
         }
         
         protected virtual string ContainerPrefix => "miruken-tests";
+        
+        protected virtual TimeSpan TimeOut => TimeSpan.FromSeconds(30);
+        
+        protected abstract Task<bool> TestReady(int externalPort);
         
         public override async ValueTask Setup(
             ConfigurationBuilder configuration,
@@ -80,16 +84,28 @@ namespace Miruken.EntityFramework.Tests
                 throw new Exception($"Could not start container: {container.ID}");
             }
 
-            var count = 10;
-            Thread.Sleep(5000);
-            var containerStat = await _docker.Containers.InspectContainerAsync(container.ID);
-            while (!containerStat.State.Running && count-- > 0)
+            Debug.WriteLine("Waiting service to start in the docker container...");
+                
+            var ready      = false;
+            var expiryTime = DateTime.Now.Add(TimeOut);
+
+            while (DateTime.Now < expiryTime && !ready)
             {
-                Thread.Sleep(1000);
-                containerStat = await _docker.Containers.InspectContainerAsync(container.ID);
+                await Task.Delay(1000);
+                ready = await TestReady(externalPort);
             }
 
-            _containerResponse = container;
+            if (ready)
+            {
+                Debug.WriteLine($"Docker container started: {container.ID}");
+            }
+            else
+            {
+                Debug.WriteLine("Docker container timeout waiting for service");
+                throw new TimeoutException();
+            }
+            
+            _containerId = container.ID;
         }
         
         protected abstract CreateContainerParameters ConfigureContainer(
@@ -142,14 +158,14 @@ namespace Miruken.EntityFramework.Tests
         
         public override async ValueTask DisposeAsync()
         {
-            if (_containerResponse == null) return;
-            
-            await _docker.Containers.KillContainerAsync(
-                _containerResponse.ID, new ContainerKillParameters());
+            if (_containerId != null)
+            {
+                await _docker.Containers.KillContainerAsync(
+                    _containerId, new ContainerKillParameters());
 
-            await _docker.Containers.RemoveContainerAsync(
-                _containerResponse.ID, new ContainerRemoveParameters());
-            
+                await _docker.Containers.RemoveContainerAsync(
+                    _containerId, new ContainerRemoveParameters());
+            }
             _docker?.Dispose();
         }
     }
