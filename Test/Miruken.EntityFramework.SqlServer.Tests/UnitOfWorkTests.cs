@@ -7,7 +7,7 @@ namespace Miruken.EntityFramework.SqlServer.Tests
     [TestClass]
     public class UnitOfWorkTests : UnitOfWorkScenario
     {
-        public UnitOfWorkTests() : base(new SqlServerSetup())
+        public UnitOfWorkTests() : base(new SqlServerDockerSetup())
         {
         }
         

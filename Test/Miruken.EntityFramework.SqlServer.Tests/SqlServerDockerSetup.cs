@@ -1,40 +1,40 @@
 // ReSharper disable InconsistentNaming
-namespace Miruken.EntityFramework.PostgresSQL.Tests
+namespace Miruken.EntityFramework.SqlServer.Tests
 {
+    using System;
     using System.Collections.Generic;
     using System.Threading.Tasks;
     using Docker.DotNet.Models;
     using EntityFramework.Tests;
+    using Microsoft.Data.SqlClient;
     using Microsoft.Extensions.Configuration;
-    using Npgsql;
 
-    public class PostgresSQLSetup : DockerDatabaseSetup
+    public class SqlServerDockerSetup : DockerDatabaseSetup
     {
         private const string Database = "miruken";
-        private const string UserId   = "postgres";
-        private const string Password = "password";
-        private const int    Port     = 5432;
+        private const string Password = "I@mJustT3st1ing";
+        private const int    Port     = 1433;
         
-        public PostgresSQLSetup() : base("postgres", "alpine", Port)
+        public SqlServerDockerSetup() : base("mcr.microsoft.com/mssql/server", "2019-latest", Port)
         {
         }
 
+        protected override TimeSpan TimeOut => TimeSpan.FromSeconds(120);
+        
         protected override CreateContainerParameters ConfigureContainer(
             ConfigurationBuilder configuration, int externalPort)
         {
             configuration.AddInMemoryCollection(new Dictionary<string, string>
             {
-                ["ConnectionStrings:SportsContext"] = BuildConnectionString(externalPort) 
+                ["ConnectionStrings:SportsContext"] = BuildConnectionString(externalPort, Database) 
             });
 
             return new CreateContainerParameters
             {
-                User = UserId,
                 Env  = new []
                 {
-                    $"POSTGRES_PASSWORD={Password}",
-                    $"POSTGRES_DB={Database}",
-                    $"POSTGRES_USER={UserId}"
+                    "ACCEPT_EULA=Y",
+                    $"SA_PASSWORD={Password}"
                 }
             };
         }
@@ -43,7 +43,7 @@ namespace Miruken.EntityFramework.PostgresSQL.Tests
         {
             try
             {
-                await using var connection = new NpgsqlConnection(BuildConnectionString(externalPort));
+                await using var connection = new SqlConnection(BuildConnectionString(externalPort, "master"));
                 await connection.OpenAsync();
                 return true;
             }
@@ -53,7 +53,7 @@ namespace Miruken.EntityFramework.PostgresSQL.Tests
             }
         }
 
-        private static string BuildConnectionString(int externalPort) =>
-            $"User ID={UserId};Password={Password};Server=127.0.0.1;Port={externalPort};Database={Database};Integrated Security=true;Pooling=false;CommandTimeout=3000";
+        private static string BuildConnectionString(int externalPort, string database) =>
+            $"Server=127.0.0.1,{externalPort};Database={database};User Id=sa;Password={Password};";
     }
 }

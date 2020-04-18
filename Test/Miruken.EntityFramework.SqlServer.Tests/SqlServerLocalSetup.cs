@@ -7,7 +7,7 @@ namespace Miruken.EntityFramework.SqlServer.Tests
     using Microsoft.Extensions.Configuration;
     using Microsoft.Extensions.DependencyInjection;
 
-    public class SqlServerSetup : DatabaseSetup
+    public class SqlServerLocalSetup : DatabaseSetup
     {
         public override ValueTask Setup(
             ConfigurationBuilder configuration,
