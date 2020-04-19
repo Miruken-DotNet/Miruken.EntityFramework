@@ -6,6 +6,13 @@
 
     public static class EntityFrameworkSetupExtensions
     {
+        public static EntityFrameworkSetup UseSqlite(
+            this EntityFrameworkSetup setup,
+            Type dbContextConfiguration = null)
+        {
+            return setup.DbContext(typeof(UseSqlite<>), dbContextConfiguration);
+        }
+        
         public static EntityFrameworkSetup UseSqlite<T>(
             this EntityFrameworkSetup setup)
             where T : DbContext

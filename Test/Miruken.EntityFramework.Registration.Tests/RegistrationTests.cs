@@ -49,7 +49,7 @@ namespace Miruken.EntityFramework.Registration.Tests
                             sources => sources.FromAssemblyOf<RegistrationTests>(),
                             sources => sources.FromAssemblyOf<DatabaseScenario>())
                         .WithEntityFrameworkCore(setup => setup
-                            .DbContext<UseSqlite<SportsContext>>()
+                            .UseSqlite<SportsContext>()
                         )
                         .WithLogging();
                 }).Build();
@@ -70,7 +70,7 @@ namespace Miruken.EntityFramework.Registration.Tests
                             sources => sources.FromAssemblyOf<RegistrationTests>(),
                             sources => sources.FromAssemblyOf<DatabaseScenario>())
                         .WithEntityFrameworkCore(setup => setup
-                            .DbContext<UseSqlite<SportsContext>, ConfigureSqlite<SportsContext>>()
+                            .UseSqlite<SportsContext, ConfigureSqlite<SportsContext>>()
                         )
                         .WithLogging();
                 }).Build();

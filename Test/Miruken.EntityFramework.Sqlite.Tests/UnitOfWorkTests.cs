@@ -13,7 +13,7 @@ namespace Miruken.EntityFramework.Sqlite.Tests
         
         protected override void Setup(EntityFrameworkSetup setup)
         {
-            setup.DbContext(typeof(UseSqlite<>));
+            setup.UseSqlite();
         }
     }
 }

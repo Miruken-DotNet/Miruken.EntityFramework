@@ -6,6 +6,13 @@
 
     public static class EntityFrameworkSetupExtensions
     {
+        public static EntityFrameworkSetup UseSqlServer(
+            this EntityFrameworkSetup setup,
+            Type dbContextConfiguration = null)
+        {
+            return setup.DbContext(typeof(UseSqlServer<>), dbContextConfiguration);
+        }
+        
         public static EntityFrameworkSetup UseSqlServer<T>(
             this EntityFrameworkSetup setup)
             where T : DbContext

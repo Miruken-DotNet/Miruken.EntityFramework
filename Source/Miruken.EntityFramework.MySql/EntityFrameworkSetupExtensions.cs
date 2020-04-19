@@ -6,6 +6,13 @@
 
     public static class EntityFrameworkSetupExtensions
     {
+        public static EntityFrameworkSetup UseMySql(
+            this EntityFrameworkSetup setup,
+            Type dbContextConfiguration = null)
+        {
+            return setup.DbContext(typeof(UseMySql<>), dbContextConfiguration);
+        }
+
         public static EntityFrameworkSetup UseMySql<T>(
             this EntityFrameworkSetup setup)
             where T : DbContext

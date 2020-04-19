@@ -13,7 +13,7 @@ namespace Miruken.EntityFramework.SqlServer.Tests
         
         protected override void Setup(EntityFrameworkSetup setup)
         {
-            setup.DbContext(typeof(UseSqlServer<>));
+            setup.UseSqlServer();
         }
     }
 }

@@ -1,4 +1,5 @@
-﻿namespace Miruken.EntityFramework.PostgresSQL
+﻿// ReSharper disable InconsistentNaming
+namespace Miruken.EntityFramework.PostgresSQL
 {
     using System;
     using Microsoft.EntityFrameworkCore;
@@ -6,6 +7,13 @@
 
     public static class EntityFrameworkSetupExtensions
     {
+        public static EntityFrameworkSetup UsePostgresSQL(
+            this EntityFrameworkSetup setup,
+            Type dbContextConfiguration = null)
+        {
+            return setup.DbContext(typeof(UsePostgresSQL<>), dbContextConfiguration);
+        }
+        
         public static EntityFrameworkSetup UsePostgresSQL<T>(
             this EntityFrameworkSetup setup)
             where T : DbContext

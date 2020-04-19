@@ -13,7 +13,7 @@ namespace Miruken.EntityFramework.PostgresSQL.Tests
         
         protected override void Setup(EntityFrameworkSetup setup)
         {
-            setup.DbContext(typeof(UsePostgresSQL<>));
+            setup.UsePostgresSQL();
         }
     }
 }

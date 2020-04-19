@@ -12,7 +12,7 @@
         
         protected override void Setup(EntityFrameworkSetup setup)
         {
-            setup.DbContext(typeof(UseMySql<>));
+            setup.UseMySql();
         }
     }
 }
