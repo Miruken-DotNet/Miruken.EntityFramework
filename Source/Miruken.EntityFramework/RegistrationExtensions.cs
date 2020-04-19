@@ -19,6 +19,7 @@
                 var setup = new EntityFrameworkSetup(services);
                 configure(setup);
                 setup.Complete();
+                registration.Sources(sources => sources.FromAssemblies(setup.Assemblies));
             });
 
             return registration

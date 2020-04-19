@@ -36,7 +36,7 @@ namespace Miruken.EntityFramework.Registration.Tests
 
             _configuration = configurationBuilder.Build();
         }
-
+        
         [TestMethod]
         public void Should_Configure_DbContext()
         {
@@ -137,7 +137,7 @@ namespace Miruken.EntityFramework.Registration.Tests
                             sources => sources.FromAssemblyOf<DatabaseScenario>())
                         .WithEntityFrameworkCore(setup => setup
                             .UseSqlite<SportsContext, ConfigureSqlite<SportsContext>>()
-                            .DbContext(typeof(UseSqlServer<>), typeof(ConfigureSqlServer<>))
+                            .UseSqlServer(typeof(ConfigureSqlServer<>))
                         )
                         .WithLogging();
                 }).Build();
@@ -151,6 +151,31 @@ namespace Miruken.EntityFramework.Registration.Tests
             Assert.IsTrue(ConfigureSqlServer<CustomerContext>.Configured);
         }
 
+        [TestMethod]
+        public void Should_Allow_Default_Specification_With_Configuration()
+        {
+            var called  = 0;
+            var context = new ServiceCollection()
+                .AddSingleton(_configuration)
+                .AddMiruken(configure =>
+                {
+                    configure
+                        .PublicSources(
+                            sources => sources.FromAssemblyOf<RegistrationTests>(),
+                            sources => sources.FromAssemblyOf<DatabaseScenario>())
+                        .WithEntityFrameworkCore(setup => setup.UseSqlServer(builder => ++called))
+                        .WithLogging();
+                }).Build();
+
+            using var sportsContext = context.Create<SportsContext>();
+            Assert.IsNotNull(sportsContext);
+            Assert.AreEqual(1, called);
+
+            using var customerContext = context.Create<CustomerContext>();
+            Assert.IsNotNull(customerContext);
+            Assert.AreEqual(2, called);
+        }
+        
         [TestMethod,
          ExpectedException(typeof(InvalidOperationException))]
         public void Should_Fail_If_DbContext_Already_Specified()
@@ -184,8 +209,8 @@ namespace Miruken.EntityFramework.Registration.Tests
                             sources => sources.FromAssemblyOf<RegistrationTests>(),
                             sources => sources.FromAssemblyOf<DatabaseScenario>())
                         .WithEntityFrameworkCore(setup => setup
-                            .DbContext(typeof(UseSqlServer<>))
-                            .DbContext(typeof(UseSqlite<>))
+                            .UseSqlServer()
+                            .UseSqlite()
                         )
                         .WithLogging();
                 }).Build();

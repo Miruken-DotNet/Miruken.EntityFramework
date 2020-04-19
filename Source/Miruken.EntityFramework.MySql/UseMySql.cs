@@ -14,11 +14,8 @@
             IConfiguration            configuration,
             [Optional] ILoggerFactory loggerFactory,
             [Optional] Configuration  configure)
-            : base(configuration.
-                CreateDbContextExtensions<T, MySqlDbContextOptionsBuilder>(
-                    UseSqlServer, loggerFactory,
-                    configure != null ? configure.Apply :
-                        (Action<MySqlDbContextOptionsBuilder>)null))
+            : base(configuration.ApplyOptions<T, MySqlDbContextOptionsBuilder>(
+                    UseSqlServer, loggerFactory, configure))
         {
         }
 
@@ -37,6 +34,22 @@
         public abstract class Configuration : IExtension<UseMySql<T>>
         {
             public abstract void Apply(MySqlDbContextOptionsBuilder builder);
+            
+            public static implicit operator Action<MySqlDbContextOptionsBuilder>(
+                Configuration c) => c != null ? c.Apply
+                    : (Action<MySqlDbContextOptionsBuilder>) null;
+        }
+        
+        public class ActionConfiguration : Configuration
+        {
+            private readonly Action<MySqlDbContextOptionsBuilder> _action;
+
+            public ActionConfiguration(Action<MySqlDbContextOptionsBuilder> action)
+            {
+                _action = action ?? throw new ArgumentNullException(nameof(action));
+            }
+            
+            public override void Apply(MySqlDbContextOptionsBuilder builder) => _action(builder);
         }
     }
 }

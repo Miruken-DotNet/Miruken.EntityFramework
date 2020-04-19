@@ -1,18 +1,13 @@
 ﻿namespace Miruken.EntityFramework.SqlServer
 {
     using System;
+    using Callback;
     using Microsoft.EntityFrameworkCore;
     using Microsoft.EntityFrameworkCore.Infrastructure;
+    using Microsoft.Extensions.DependencyInjection;
 
     public static class EntityFrameworkSetupExtensions
     {
-        public static EntityFrameworkSetup UseSqlServer(
-            this EntityFrameworkSetup setup,
-            Type dbContextConfiguration = null)
-        {
-            return setup.DbContext(typeof(UseSqlServer<>), dbContextConfiguration);
-        }
-        
         public static EntityFrameworkSetup UseSqlServer<T>(
             this EntityFrameworkSetup setup)
             where T : DbContext
@@ -34,25 +29,43 @@
             where T : DbContext
         {
             return configure != null
-                 ? setup.DbContext<UseSqlServer<T>, SqlServerConfiguration<T>>(
-                    new SqlServerConfiguration<T>(configure))
+                 ? setup.DbContext<UseSqlServer<T>>(services => services
+                     .AddSingleton(new UseSqlServer<T>.ActionConfiguration(configure)))
                  : setup.DbContext<UseSqlServer<T>>();
         }
+        
+        public static EntityFrameworkSetup UseSqlServer(
+            this EntityFrameworkSetup setup,
+            Type dbContextConfiguration = null)
+        {
+            return setup.DbContext(typeof(UseSqlServer<>), dbContextConfiguration);
+        }
+        
+        public static EntityFrameworkSetup UseSqlServer(
+            this EntityFrameworkSetup setup,
+            Action<SqlServerDbContextOptionsBuilder> configure)
+        {
+            return setup.DbContext(typeof(UseSqlServer<>), action: services =>
+                services.AddSingleton(new DefaultActionConfigurationProvider(configure)));
+        }
 
-        private class SqlServerConfiguration<T> : UseSqlServer<T>.Configuration
-            where T : DbContext
+        [Unmanaged]
+        private class DefaultActionConfigurationProvider : Handler
         {
             private readonly Action<SqlServerDbContextOptionsBuilder> _configure;
 
-            public SqlServerConfiguration(
+            public DefaultActionConfigurationProvider(
                 Action<SqlServerDbContextOptionsBuilder> configure)
             {
                 _configure = configure;
             }
 
-            public override void Apply(SqlServerDbContextOptionsBuilder builder)
+            [Provides, Singleton]
+            public UseSqlServer<T>.Configuration Get<T>()
+                where T : DbContext
             {
-                _configure(builder);
+                return (UseSqlServer<T>.Configuration) Activator.CreateInstance(
+                    typeof(UseSqlServer<T>.ActionConfiguration), _configure);
             }
         }
     }

@@ -14,10 +14,8 @@
                        IConfiguration configuration,
             [Optional] ILoggerFactory loggerFactory,
             [Optional] Configuration  configure)
-            : base(configuration.
-                CreateDbContextExtensions<T, SqliteDbContextOptionsBuilder>(
-                    Setup, loggerFactory, configure != null ? configure.Apply
-                        : (Action<SqliteDbContextOptionsBuilder>)null))
+            : base(configuration.ApplyOptions<T, SqliteDbContextOptionsBuilder>(
+                    Setup, loggerFactory, configure))
         {
         }
 
@@ -36,6 +34,22 @@
         public abstract class Configuration : IExtension<UseSqlite<T>>
         {
             public abstract void Apply(SqliteDbContextOptionsBuilder builder);
+            
+            public static implicit operator Action<SqliteDbContextOptionsBuilder>(
+                Configuration c) => c != null ? c.Apply
+                    : (Action<SqliteDbContextOptionsBuilder>) null;
+        }
+        
+        public class ActionConfiguration : Configuration
+        {
+            private readonly Action<SqliteDbContextOptionsBuilder> _action;
+
+            public ActionConfiguration(Action<SqliteDbContextOptionsBuilder> action)
+            {
+                _action = action ?? throw new ArgumentNullException(nameof(action));
+            }
+            
+            public override void Apply(SqliteDbContextOptionsBuilder builder) => _action(builder);
         }
     }
 }

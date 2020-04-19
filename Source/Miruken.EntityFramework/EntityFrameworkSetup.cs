@@ -3,6 +3,7 @@
     using System;
     using System.Collections.Generic;
     using System.Linq;
+    using System.Reflection;
     using Infrastructure;
     using Microsoft.EntityFrameworkCore;
     using Microsoft.Extensions.DependencyInjection;
@@ -11,43 +12,39 @@
     {
         private readonly IServiceCollection _services;
         private readonly Dictionary<Type, (int, Type, Type, Type)> _bindings;
+        private readonly HashSet<Assembly> _assemblies;
         private bool _hasDefaultProviderType;
 
         public EntityFrameworkSetup(IServiceCollection services)
         {
-            _services = services;
-            _bindings = new Dictionary<Type, (int, Type, Type, Type)>();
+            _services   = services;
+            _bindings   = new Dictionary<Type, (int, Type, Type, Type)>();
+            _assemblies = new HashSet<Assembly>();
         }
 
-        public EntityFrameworkSetup DbContext<T>()
+        public IEnumerable<Assembly> Assemblies => _assemblies;
+        
+        public EntityFrameworkSetup DbContext<T>(
+            Action<IServiceCollection> action = null)
             where T : DbContextOptions
         {
-            return BindDbContext(typeof(T));
+            return BindDbContext(typeof(T), null, action);
         }
 
-        public EntityFrameworkSetup DbContext<T, TC>()
+        public EntityFrameworkSetup DbContext<T, TC>(
+            Action<IServiceCollection> action = null)
             where T  : DbContextOptions
             where TC : IExtension<T>
         {
-           return BindDbContext(typeof(T), typeof(TC));
+           return BindDbContext(typeof(T), typeof(TC), action);
         }
-
-        public EntityFrameworkSetup DbContext<T, TC>(TC configuration)
-            where T : DbContextOptions
-            where TC : class, IExtension<T>
-        {
-            if (configuration == null)
-                throw new ArgumentNullException(nameof(configuration));
-            BindDbContext(typeof(T));
-            _services.AddSingleton(configuration);
-            return this;
-        }
-
+        
         public EntityFrameworkSetup DbContext(
             Type dbContextProvider,
-            Type dbContextConfiguration = null)
+            Type dbContextConfiguration = null,
+            Action<IServiceCollection> action = null)
         {
-            return BindDbContext(dbContextProvider, dbContextConfiguration);
+            return BindDbContext(dbContextProvider, dbContextConfiguration, action);
         }
 
         internal void Complete()
@@ -66,7 +63,8 @@
 
         private EntityFrameworkSetup BindDbContext(
             Type dbContextProviderType,
-            Type dbContextConfigurationType = null)
+            Type dbContextConfigurationType,
+            Action<IServiceCollection> action)
         {
             if (dbContextProviderType == null)
                 throw new ArgumentNullException(nameof(dbContextProviderType));
@@ -126,6 +124,10 @@
                     configurationType)
                 );
 
+            _assemblies.Add(dbContextProviderType.Assembly);
+            
+            action?.Invoke(_services);
+            
             return this;
         }
 

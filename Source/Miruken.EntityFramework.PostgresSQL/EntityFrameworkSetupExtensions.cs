@@ -2,18 +2,13 @@
 namespace Miruken.EntityFramework.PostgresSQL
 {
     using System;
+    using Callback;
     using Microsoft.EntityFrameworkCore;
+    using Microsoft.Extensions.DependencyInjection;
     using Npgsql.EntityFrameworkCore.PostgreSQL.Infrastructure;
 
     public static class EntityFrameworkSetupExtensions
     {
-        public static EntityFrameworkSetup UsePostgresSQL(
-            this EntityFrameworkSetup setup,
-            Type dbContextConfiguration = null)
-        {
-            return setup.DbContext(typeof(UsePostgresSQL<>), dbContextConfiguration);
-        }
-        
         public static EntityFrameworkSetup UsePostgresSQL<T>(
             this EntityFrameworkSetup setup)
             where T : DbContext
@@ -35,25 +30,43 @@ namespace Miruken.EntityFramework.PostgresSQL
             where T : DbContext
         {
             return configure != null
-                 ? setup.DbContext<UsePostgresSQL<T>, PostgresSQLConfiguration<T>>(
-                     new PostgresSQLConfiguration<T>(configure))
+                 ? setup.DbContext<UsePostgresSQL<T>>(services => services
+                     .AddSingleton(new UsePostgresSQL<T>.ActionConfiguration(configure)))
                  : setup.DbContext<UsePostgresSQL<T>>();
         }
+        
+        public static EntityFrameworkSetup UsePostgresSQL(
+            this EntityFrameworkSetup setup,
+            Type dbContextConfiguration = null)
+        {
+            return setup.DbContext(typeof(UsePostgresSQL<>), dbContextConfiguration);
+        }
+        
+        public static EntityFrameworkSetup UsePostgresSQL(
+            this EntityFrameworkSetup setup,
+            Action<NpgsqlDbContextOptionsBuilder> configure)
+        {
+            return setup.DbContext(typeof(UsePostgresSQL<>), action: services =>
+                services.AddSingleton(new DefaultActionConfigurationProvider(configure)));
+        }
 
-        private class PostgresSQLConfiguration<T> : UsePostgresSQL<T>.Configuration
-            where T : DbContext
+        [Unmanaged]
+        private class DefaultActionConfigurationProvider : Handler
         {
             private readonly Action<NpgsqlDbContextOptionsBuilder> _configure;
 
-            public PostgresSQLConfiguration(
+            public DefaultActionConfigurationProvider(
                 Action<NpgsqlDbContextOptionsBuilder> configure)
             {
                 _configure = configure;
             }
 
-            public override void Apply(NpgsqlDbContextOptionsBuilder builder)
+            [Provides, Singleton]
+            public UsePostgresSQL<T>.Configuration Get<T>()
+                where T : DbContext
             {
-                _configure(builder);
+                return (UsePostgresSQL<T>.Configuration) Activator.CreateInstance(
+                    typeof(UsePostgresSQL<T>.ActionConfiguration), _configure);
             }
         }
     }

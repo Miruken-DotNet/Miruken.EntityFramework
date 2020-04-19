@@ -15,10 +15,8 @@ namespace Miruken.EntityFramework.PostgresSQL
                        IConfiguration configuration,
             [Optional] ILoggerFactory loggerFactory,
             [Optional] Configuration  configure)
-            : base(configuration.
-                CreateDbContextExtensions<T, NpgsqlDbContextOptionsBuilder>(
-                    Setup, loggerFactory, configure != null ? configure.Apply
-                        : (Action<NpgsqlDbContextOptionsBuilder>)null))
+            : base(configuration.ApplyOptions<T, NpgsqlDbContextOptionsBuilder>(
+                    Setup, loggerFactory, configure))
         {
         }
 
@@ -37,6 +35,22 @@ namespace Miruken.EntityFramework.PostgresSQL
         public abstract class Configuration : IExtension<UsePostgresSQL<T>>
         {
             public abstract void Apply(NpgsqlDbContextOptionsBuilder builder);
+            
+            public static implicit operator Action<NpgsqlDbContextOptionsBuilder>(
+                Configuration c) => c != null ? c.Apply
+                    : (Action<NpgsqlDbContextOptionsBuilder>) null;
+        }
+        
+        public class ActionConfiguration : Configuration
+        {
+            private readonly Action<NpgsqlDbContextOptionsBuilder> _action;
+
+            public ActionConfiguration(Action<NpgsqlDbContextOptionsBuilder> action)
+            {
+                _action = action ?? throw new ArgumentNullException(nameof(action));
+            }
+            
+            public override void Apply(NpgsqlDbContextOptionsBuilder builder) => _action(builder);
         }
     }
 }

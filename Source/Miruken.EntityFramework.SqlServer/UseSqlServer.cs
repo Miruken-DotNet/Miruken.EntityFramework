@@ -14,10 +14,8 @@
                        IConfiguration configuration,
             [Optional] ILoggerFactory loggerFactory,
             [Optional] Configuration  configure)
-            : base(configuration.
-                CreateDbContextExtensions<T, SqlServerDbContextOptionsBuilder>(
-                    Setup, loggerFactory, configure != null ? configure.Apply
-                        : (Action<SqlServerDbContextOptionsBuilder>)null))
+            : base(configuration.ApplyOptions<T, SqlServerDbContextOptionsBuilder>(
+                    Setup, loggerFactory, configure))
         {
         }
 
@@ -36,6 +34,22 @@
         public abstract class Configuration : IExtension<UseSqlServer<T>>
         {
             public abstract void Apply(SqlServerDbContextOptionsBuilder builder);
+
+            public static implicit operator Action<SqlServerDbContextOptionsBuilder>(
+                Configuration c) => c != null ? c.Apply
+                    : (Action<SqlServerDbContextOptionsBuilder>) null;
+        }
+
+        public class ActionConfiguration : Configuration
+        {
+            private readonly Action<SqlServerDbContextOptionsBuilder> _action;
+
+            public ActionConfiguration(Action<SqlServerDbContextOptionsBuilder> action)
+            {
+                _action = action ?? throw new ArgumentNullException(nameof(action));
+            }
+            
+            public override void Apply(SqlServerDbContextOptionsBuilder builder) => _action(builder);
         }
     }
 }

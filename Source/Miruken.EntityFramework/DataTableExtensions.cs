@@ -6,7 +6,7 @@
     using System.Data;
     using System.Reflection;
 
-    public static class DataTableExtension
+    public static class DataTableExtensions
     {
         public static DataTable ToDataTable<T>(this IEnumerable<T> items)
         {
