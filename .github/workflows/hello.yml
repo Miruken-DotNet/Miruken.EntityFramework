@@ -20,3 +20,15 @@ jobs:
       run: echo "Hi"
     - name: Say Howdy
       run: echo "Howdy"
+
+  fizzbuzz:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Fizz
+      run: echo "fizz"
+    - name: Buzz
+      run: echo "buzz"
+    - name: FizzBuzz
+      run: echo "fizzBuzz"
