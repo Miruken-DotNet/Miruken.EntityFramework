@@ -1,0 +1,22 @@
+name: Say Hello Workflow
+
+on:
+  push:
+    branches: 
+      - master
+      - 'feature/*'
+  pull_request:
+    branches: [ master ]
+
+jobs:
+  job1:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Say Hello
+      run: echo "Hello"
+    - name: Say Hi
+      run: echo "Hi"
+    - name: Say Howdy
+      run: echo "Howdy"
