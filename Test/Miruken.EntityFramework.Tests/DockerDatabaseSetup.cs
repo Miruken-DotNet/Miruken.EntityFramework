@@ -114,21 +114,24 @@ namespace Miruken.EntityFramework.Tests
         private async Task PullImage()
         {
             // look for image
-            var images = await _docker.Images.ListImagesAsync(new ImagesListParameters
-            {
-                MatchName = _imageName
-            }, CancellationToken.None);
+            var images = await _docker.Images.ListImagesAsync(
+                new ImagesListParameters
+                {
+                    MatchName = _imageName
+                }, CancellationToken.None);
 
             // Check if container exists
-            var pgImage = images.FirstOrDefault();
-            if (pgImage == null)
+            // MatchName does not seem to be working
+            var hasImage = images.Any(image => image.RepoTags?.Contains(_imageName) == true);
+            if (!hasImage)
             {
                 Debug.WriteLine($"Pulling docker image {_imageName}");
-                await _docker.Images.CreateImageAsync(new ImagesCreateParameters
-                {
-                    FromImage = _image,
-                    Tag       = _tag
-                }, null, new Progress<JSONMessage>());
+                await _docker.Images.CreateImageAsync(
+                    new ImagesCreateParameters
+                    {
+                        FromImage = _image,
+                        Tag       = _tag
+                    }, null, new Progress<JSONMessage>());
             }
         }
 
