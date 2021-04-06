@@ -84,6 +84,8 @@ namespace Miruken.EntityFramework.Tests
                 throw new Exception($"Could not start container: {container.ID}");
             }
 
+            _containerId = container.ID;
+            
             Debug.WriteLine("Waiting service to start in the docker container...");
                 
             var ready      = false;
@@ -104,8 +106,6 @@ namespace Miruken.EntityFramework.Tests
                 Debug.WriteLine("Docker container timeout waiting for service");
                 throw new TimeoutException();
             }
-            
-            _containerId = container.ID;
         }
         
         protected abstract CreateContainerParameters ConfigureContainer(
@@ -163,11 +163,22 @@ namespace Miruken.EntityFramework.Tests
         {
             if (_containerId != null)
             {
-                await _docker.Containers.KillContainerAsync(
-                    _containerId, new ContainerKillParameters());
-
+                try
+                {
+                    await _docker.Containers.KillContainerAsync(
+                        _containerId, new ContainerKillParameters());
+                }
+                catch
+                {
+                    // ignore
+                }
+                
                 await _docker.Containers.RemoveContainerAsync(
-                    _containerId, new ContainerRemoveParameters());
+                    _containerId, new ContainerRemoveParameters
+                    {
+                        RemoveVolumes = true, 
+                        Force         = true
+                    });
             }
             _docker?.Dispose();
         }

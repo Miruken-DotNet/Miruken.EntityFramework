@@ -2,7 +2,7 @@
 {
     using System;
     using System.Collections.Generic;
-    using global::MySql.Data.MySqlClient;
+    using MySqlConnector;
 
     public static class MySqlParameterExtensions
     {

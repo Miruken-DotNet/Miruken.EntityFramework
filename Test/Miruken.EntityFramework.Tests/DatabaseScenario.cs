@@ -12,7 +12,6 @@
     using Microsoft.Extensions.DependencyInjection;
     using Microsoft.VisualStudio.TestTools.UnitTesting;
     using Register;
-    using ServiceCollection = Register.ServiceCollection;
 
     public abstract class DatabaseScenario
     {

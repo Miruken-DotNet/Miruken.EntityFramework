@@ -15,7 +15,6 @@ namespace Miruken.EntityFramework.Registration.Tests
     using Register;
     using Sqlite;
     using SqlServer;
-    using ServiceCollection = Register.ServiceCollection;
 
     [TestClass]
     public class RegistrationTests

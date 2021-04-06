@@ -5,8 +5,8 @@ namespace Miruken.EntityFramework.MySql.Tests
     using System.Threading.Tasks;
     using Docker.DotNet.Models;
     using EntityFramework.Tests;
-    using global::MySql.Data.MySqlClient;
     using Microsoft.Extensions.Configuration;
+    using MySqlConnector;
 
     public class MySqlSetup : DockerDatabaseSetup
     {

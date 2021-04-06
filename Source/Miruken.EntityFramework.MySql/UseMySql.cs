@@ -12,10 +12,12 @@
     {
         public UseMySql(
             IConfiguration            configuration,
+            MySqlServerVersion        serverVersion,
             [Optional] ILoggerFactory loggerFactory,
             [Optional] Configuration  configure)
             : base(configuration.ApplyOptions<T, MySqlDbContextOptionsBuilder>(
-                    UseSqlServer, loggerFactory, configure))
+                (b, c, cs, o) => UseSqlServer(b, c, cs, serverVersion, o),
+                loggerFactory, configure))
         {
         }
 
@@ -23,12 +25,10 @@
             DbContextOptionsBuilder              builder,
             IConfiguration                       configuration,
             string                               connectionString,
+            MySqlServerVersion                   serverVersion,
             Action<MySqlDbContextOptionsBuilder> options = null)
         {
-            if (options != null)
-                builder.UseMySql(connectionString, options);
-            else
-                builder.UseMySql(connectionString);
+            builder.UseMySql(connectionString, serverVersion, options);
         }
 
         public abstract class Configuration : IExtension<UseMySql<T>>
